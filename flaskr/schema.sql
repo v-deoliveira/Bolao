@@ -1,0 +1,51 @@
+DROP TABLE IF EXISTS predictions;
+DROP TABLE IF EXISTS matches;
+DROP TABLE IF EXISTS teams;
+DROP TABLE IF EXISTS competitions;
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    hash TEXT NOT NULL
+);
+
+CREATE TABLE competitions (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    season TEXT NOT NULL
+);
+
+CREATE TABLE teams (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE matches (
+    id INTEGER PRIMARY KEY,
+    competition_id INTEGER NOT NULL,
+    home_team_id INTEGER NOT NULL,
+    away_team_id INTEGER NOT NULL,
+    match_date DATETIME,
+    home_score INTEGER,
+    away_score INTEGER,
+    status INTEGER DEFAULT 0,
+
+    FOREIGN KEY (competition_id) REFERENCES competitions (id) ON DELETE CASCADE,
+    FOREIGN KEY (home_team_id) REFERENCES teams (id),
+    FOREIGN KEY (away_team_id) REFERENCES teams (id)
+);
+
+CREATE TABLE predictions (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    match_id INTEGER NOT NULL,
+    home_score INTEGER NOT NULL,
+    away_score INTEGER NOT NULL,
+    points INTEGER DEFAULT 0,
+
+    UNIQUE(user_id, match_id),
+
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (match_id) REFERENCES matches (id) ON DELETE CASCADE
+);
