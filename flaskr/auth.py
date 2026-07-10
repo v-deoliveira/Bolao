@@ -42,7 +42,7 @@ def register():
     return render_template("auth/register.html")
 
 
-bp.route('/login', methods=('GET', 'POST'))
+@bp.route('/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
         username = request.form.get("username")
@@ -68,7 +68,10 @@ def login():
     return render_template("auth/login.html")
 
 
-bp.before_app_request
+# load_logged_in_user checks if a user id is stored in the session and gets that user’s data from the database,
+# storing it on g.user, which lasts for the length of the request.
+# If there is no user id, or if the id doesn’t exist, g.user will be None.
+@bp.before_app_request
 def load_logged_in_user():
     user_id = session.get("user_id")
 
@@ -79,8 +82,20 @@ def load_logged_in_user():
             "SELECT * FROM users WHERE id = ?", (user_id,)
         ).fetchone()
 
-bp.route('/logout')
+
+@bp.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for("index"))
+
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for("auth.login"))
+        
+        return view(**kwargs)
+    
+    return wrapped_view
 
