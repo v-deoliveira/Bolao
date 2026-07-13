@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Get bootstrap without Pooper -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+
+        <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+
+        <title>Bolao {% block title %}{% endblock %}</title>
+    </head>
+
+    <!-- Using a dark theme navbar-->
+    <nav class="navbar navbar-expand-md bg-dark border-bottom border-body" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><span class="green">Bolao</span></a>
+            <!-- Dont understand the use of this "button", but follow bootstrap tutorials-->
+            <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+                 <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbar">
+                    <!-- me-auto == left / ms-auto == right-->
+                    {% if g.user %}
+                        <ul class="navbar-nav me-auto mt-2">
+                            <li><span>{{ g.user["username"] }}</span></li>
+                        </ul>
+                        <ul class="navbar-nav ms-auto mt-2">
+                            <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                        </ul>
+                    {% else %}
+                        <ul class="navbar-nav ms-auto mt-2">
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.register') }}">Register</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a></li> 
+                        </ul>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <section class="content">
+        <header>
+            {% block header %}{% endblock %} 
+        </header>
+        {% for message in get_flashed_messages() %}
+            <div class="flash">{{ message }}</div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+    </section>
+</html>
