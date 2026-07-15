@@ -7,7 +7,8 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     id INTEGER PRIMARY KEY,
     username TEXT NOT NULL UNIQUE,
-    hash TEXT NOT NULL
+    hash TEXT NOT NULL,
+    is_admin INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE competitions (
