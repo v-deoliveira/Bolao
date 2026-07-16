@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block header %}
+    <h1>{% block title %}All games {% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <h3>List</h3>
+    <table class="table table-stripped">
+        <thead class="table-primary">
+            <tr>
+                <th class="start-text">Game</th>
+                <th class="text-end">Time</th>
+                <th class="text-end"></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+{% endblock %}
