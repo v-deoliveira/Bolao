@@ -26,4 +26,44 @@ def admin_required(view):
 @bp.route('/')
 @admin_required
 def index():
-    return "Admin Panel"
+    competitions = get_db().execute(
+        "SELECT * FROM competitions"
+    ).fetchall()
+    
+    teams = get_db().execute(
+        "SELECT * FROM teams"
+        "   ORDER BY name"
+    ).fetchall()
+
+    return render_template("admin/admin.html", competitions=competitions, teams=teams)
+
+@bp.route('/add_competition', methods=('GET', 'POST'))
+def add_competition():
+    db = get_db()
+    if request.method == "POST":
+        try:
+            db.execute(
+                "INSERT INTO competitions (name, season) VALUES (?, ?)",
+                (request.form.get("competition"), request.form.get("season")),
+            )
+            db.commit()
+        except db.IntegrityError:
+            flash("Error")
+    
+    return redirect(url_for("admin.index"))
+
+
+@bp.route('add_team', methods=('GET', 'POST'))
+def add_team():
+    db = get_db()
+    if request.method == "POST":
+        try:
+            db.execute(
+                "INSERT INTO teams (name) VALUES (?)",
+                (request.form.get("team"),)
+            )
+            db.commit()
+        except db.IntegrityError:
+            flash("Team already exists")
+
+    return redirect(url_for("admin.index"))

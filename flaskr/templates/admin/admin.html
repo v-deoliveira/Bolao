@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block header %}
+    <h2>{% block title %}Admin page{% endblock %}</h2>
+{% endblock %}
+
+{% block content %}
+    <h3>Create competition</h3>
+    <form action="{{ url_for('admin.add_competition') }}" method="post">
+         <input name="competition" id="competition" placeholder="Competition" type="text">
+         <input name="season" id="season" placeholder="Season" type="text">
+         <button type="submit">Submit</button>
+    </form>
+
+    <h3>Add teams</h3>
+    <form action="{{ url_for('admin.add_team') }}" method="post">
+        <input name="team" id="team" placeholder="Team name" type="text">
+        <button type="submit">Submit</button>
+    </form>
+
+    <h3>Add matches</h3>
+    <form method="post">
+        <select name="competition">
+            {% for c in competitions %}
+                <option value="{{ c.name }}">{{ c.name }} {{ c.season }}</option>
+            {% endfor %}
+        </select>
+        <label for="home_team">Home</label>
+        <select name="home_team">
+            {% for t in teams %}
+                <option value="{{ t.name }}">{{ t.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="away_team">Away</label>
+        <select name="away_team">
+            {% for t in teams %}
+                <option value="{{ t.name }}">{{ t.name }}</option>
+            {% endfor %}
+        </select>
+        <input name="datetime" type="datetime-local">
+        <button type="submit">Submit</button>
+    </form>
+
+{% endblock %}
