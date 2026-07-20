@@ -19,22 +19,22 @@
     </form>
 
     <h3>Add matches</h3>
-    <form method="post">
+    <form action="{{ url_for('admin.add_match') }}" method="post">
         <select name="competition">
             {% for c in competitions %}
-                <option value="{{ c.name }}">{{ c.name }} {{ c.season }}</option>
+                <option value="{{ c.id }}">{{ c.name }} {{ c.season }}</option>
             {% endfor %}
         </select>
         <label for="home_team">Home</label>
         <select name="home_team">
             {% for t in teams %}
-                <option value="{{ t.name }}">{{ t.name }}</option>
+                <option value="{{ t.id }}">{{ t.name }}</option>
             {% endfor %}
         </select>
         <label for="away_team">Away</label>
         <select name="away_team">
             {% for t in teams %}
-                <option value="{{ t.name }}">{{ t.name }}</option>
+                <option value="{{ t.id }}">{{ t.name }}</option>
             {% endfor %}
         </select>
         <input name="datetime" type="datetime-local">

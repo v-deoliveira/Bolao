@@ -27,7 +27,8 @@ def admin_required(view):
 @admin_required
 def index():
     competitions = get_db().execute(
-        "SELECT * FROM competitions"
+        "SELECT * FROM competitions" \
+        "   ORDER BY name, season"
     ).fetchall()
     
     teams = get_db().execute(
@@ -53,7 +54,7 @@ def add_competition():
     return redirect(url_for("admin.index"))
 
 
-@bp.route('add_team', methods=('GET', 'POST'))
+@bp.route('/add_team', methods=('GET', 'POST'))
 def add_team():
     db = get_db()
     if request.method == "POST":
@@ -65,5 +66,26 @@ def add_team():
             db.commit()
         except db.IntegrityError:
             flash("Team already exists")
+
+    return redirect(url_for("admin.index"))
+
+@bp.route('/add_match', methods=('GET', 'POST'))
+def add_match():
+    db = get_db()
+    if request.method == "POST":
+        competition = request.form.get("competition")
+        home_team = request.form.get("home_team")
+        away_team = request.form.get("away_team")
+        datetime = request.form.get("datetime")
+        try:
+            db.execute(
+                "INSERT INTO matches (competition_id," \
+                "   home_team_id, away_team_id, match_date)" \
+                "   VALUES (?, ?, ?, ?)",
+                (competition, home_team, away_team, datetime)
+            )
+            db.commit()
+        except db.IntegrityError:
+            flash("Invalid input")
 
     return redirect(url_for("admin.index"))
