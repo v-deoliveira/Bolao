@@ -26,17 +26,46 @@ def admin_required(view):
 @bp.route('/')
 @admin_required
 def index():
-    competitions = get_db().execute(
-        "SELECT * FROM competitions" \
-        "   ORDER BY name, season"
+    db = get_db()
+    competitions = db.execute(
+        """
+            SELECT * FROM competitions
+            ORDER BY name, season
+        """
     ).fetchall()
     
-    teams = get_db().execute(
-        "SELECT * FROM teams"
-        "   ORDER BY name"
+    teams = db.execute(
+        """
+            SELECT * FROM teams
+            ORDER BY name
+        """
     ).fetchall()
 
-    return render_template("admin/admin.html", competitions=competitions, teams=teams)
+    matches = db.execute(
+        """
+            SELECT matches.id,
+                competitions.name AS competitions,
+                competitions.season,
+                home.name AS home_team,
+                away.name AS away_team,
+                matches.home_score,
+                matches.away_score,
+                matches.match_date,
+                matches.status
+            FROM matches
+            JOIN competitions ON competitions.id = matches.competition_id
+            JOIN teams AS home
+                ON home.id = matches.home_team_id
+            JOIN teams AS away
+                ON away.id = matches.away_team_id
+            ORDER BY matches.match_date
+        """
+    ).fetchall()
+
+    return render_template("admin/admin.html", 
+                           competitions=competitions, 
+                           teams=teams, 
+                           matches=matches)
 
 @bp.route('/add_competition', methods=('GET', 'POST'))
 def add_competition():
