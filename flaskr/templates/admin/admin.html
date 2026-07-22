@@ -41,4 +41,20 @@
         <button type="submit">Submit</button>
     </form>
 
+    <h3>View All Matches</h3>
+    <table>
+        <tbody>
+            {% for c in competitions %}
+                <tr>
+                    <td>{{ c.name }} {{ c.season }}</td>
+                    <td>
+                        <form action="{{ url_for('admin.matches', competition_id=c['id']) }}" method="GET">
+                            <button type="submit">View</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
 {% endblock %}
