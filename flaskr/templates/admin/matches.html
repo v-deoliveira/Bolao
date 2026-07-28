@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block header %}
+    <h2>{% block title %}{{ competition.name }} {{ competition.season }}{% endblock %}</h2>
+{% endblock %}
+
+
+{% block content %}
+    <table class="table table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th class="text-start">Home</th>
+                <th class="text-start">Score</th>
+                <th class="text-start">Away</th>
+                <th class="text-start">Time</th>
+                <th class="text-start">Status</th>
+                <th class="text-end"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in matches %}
+                <tr>
+                    <td class="text-start">{{ match.home_team }}</td>
+                    <td class="text-start">{{ match.home_score }} x {{ match.away_score }}</td>
+                    <td>{{ match.away_team }}</td>
+                    <td>{{ match.match_date }}</td>
+                    <td class="text-start">
+                        {% if match.status == 0 %}
+                            Not Started/On going
+                        {% else %}
+                            Match ended
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form action="{{ url_for('admin.edit_match', match_id=match['id']) }}" method="GET">
+                            <button type="submit">Edit</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
