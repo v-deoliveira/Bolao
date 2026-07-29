@@ -99,7 +99,7 @@ def add_match():
 
     return redirect(url_for("admin.index"))
 
-@bp.route('/<int:competition_id>/matches')
+@bp.route('/competition/<int:competition_id>/matches')
 @admin_required
 def matches(competition_id):
     db = get_db()
@@ -134,11 +134,12 @@ def matches(competition_id):
     ).fetchall() #Was getting a bug because forgot fetchall()
 
     return render_template("admin/matches.html", matches=matches, 
-                                                 competition=competition)
+                                                 competition=competition,
+                                                 competition_id=competition_id)
 
-@bp.route('/<int:match_id>/edit_match', methods=('GET', 'POST'))
+@bp.route('/competition/<int:competition_id>/match/<int:match_id>/edit_match', methods=('GET', 'POST'))
 @admin_required
-def edit_match(match_id):
+def edit_match(competition_id, match_id):
     db = get_db()
 
     # I'LL NOT DO HERE USER INPUT CHECK, BECAUSE IT'S ADMIN RESTRICTED
@@ -159,6 +160,7 @@ def edit_match(match_id):
             (home_score, away_score, status, match_id)
         )
         db.commit()
+        return redirect(url_for("admin.matches", competition_id=competition_id))
     
     match = db.execute(
         """
