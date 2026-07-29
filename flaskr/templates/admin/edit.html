@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+{% block header %}
+    <h2>{% block title %}
+            {{ match.home_team }} vs {{ match.away_team }} {{ match.match_date}}
+        {% endblock %}
+    </h2>
+{% endblock %}
+
+{% block content %}
+
+    <div>
+        {% if match.status == 0 %}
+            <p>Not started/on going</p>
+        {% else %}
+            <p>Score: {{ match.home_score }} x {{ match.away_score }}</p>
+        {% endif %}
+    </div>
+    <h3>Update score</h3>
+    <form method="post">
+        <label for="home_score">{{ match.home_team }}</label>
+        <input name="home_score" autocomplete="off" type="number" min="0" required>
+        <label for="away_score">{{ match.away_team }}</label>
+        <input name="away_score" autocomplete="off" type="number" min="0" required>
+        <input name="status" value="1" type="hidden">
+        <button type="submit">Confirm</button>
+    </form>
+{% endblock %}

@@ -27,7 +27,7 @@ def admin_required(view):
 @admin_required
 def index():
     db = get_db()
-    matches = None
+
     competitions = db.execute(
         """
             SELECT * FROM competitions
@@ -102,26 +102,80 @@ def add_match():
 @bp.route('/<int:competition_id>/matches')
 @admin_required
 def matches(competition_id):
-    matches = get_db().execute(
+    db = get_db()
+
+    competition = db.execute(
         """
-                SELECT matches.id,
-                    competitions.name AS competitions,
-                    competitions.season,
-                    home.name AS home_team,
-                    away.name AS away_team,
-                    matches.home_score,
-                    matches.away_score,
-                    matches.match_date,
-                    matches.status
-                FROM matches
-                JOIN competitions ON competitions.id = matches.competition_id
-                JOIN teams AS home
-                    ON home.id = matches.home_team_id
-                JOIN teams AS away
-                    ON away.id = matches.away_team_id
-                WHERE matches.competition_id = ?
-                ORDER BY matches.match_date
+            SELECT name, season
+            FROM competitions
+            WHERE id = ?
+        """,
+        (competition_id,)
+    ).fetchone()
+
+    matches = db.execute(
+        """
+            SELECT matches.id,
+                home.name AS home_team,
+                away.name AS away_team,
+                matches.home_score,
+                matches.away_score,
+                matches.match_date,
+                matches.status
+            FROM matches
+            JOIN teams AS home
+                ON home.id = matches.home_team_id
+            JOIN teams AS away
+                ON away.id = matches.away_team_id
+            WHERE matches.competition_id = ?
+            ORDER BY matches.match_date
+        """,
+        (competition_id,)
+    ).fetchall() #Was getting a bug because forgot fetchall()
+
+    return render_template("admin/matches.html", matches=matches, 
+                                                 competition=competition)
+
+@bp.route('/<int:match_id>/edit_match', methods=('GET', 'POST'))
+@admin_required
+def edit_match(match_id):
+    db = get_db()
+
+    # I'LL NOT DO HERE USER INPUT CHECK, BECAUSE IT'S ADMIN RESTRICTED
+    if request.method == "POST":
+
+        home_score = request.form.get("home_score")
+        away_score = request.form.get("away_score")
+        status = request.form.get("status")
+
+        db.execute(
+            """
+                UPDATE matches
+                SET home_score = ?,
+                    away_score = ?,
+                    status = ?
+                WHERE id = ?
             """,
-            (competition_id,)
-    )
-    return render_template("admin/matches.html", matches=matches)
+            (home_score, away_score, status, match_id)
+        )
+        db.commit()
+    
+    match = db.execute(
+        """
+            SELECT home.name AS home_team,
+                away.name AS away_team,
+                matches.home_score,
+                matches.away_score,
+                matches.match_date,
+                matches.status
+            FROM matches
+            JOIN teams AS home
+                ON home.id = matches.home_team_id
+            JOIN teams AS away
+                ON away.id = matches.away_team_id
+            WHERE matches.id = ?
+        """,
+        (match_id,)
+    ).fetchone()
+    
+    return render_template("admin/edit.html", match=match)
