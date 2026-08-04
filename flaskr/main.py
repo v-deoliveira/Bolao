@@ -20,15 +20,43 @@ def matches():
     competitions = db.execute(
         """
             SELECT * FROM competitions
+            ORDER BY season
         """
     ).fetchall()
 
     matches = db.execute(
         """
-            SELECT * FROM matches
-            WHERE competition_id = ?
+            SELECT home.name AS home_team, 
+                away.name AS away_team, 
+                matches.id, 
+                matches.home_score, 
+                matches.away_score, 
+                matches.match_date, 
+                matches.status
+            FROM matches
+            JOIN teams AS home
+                ON home.id = matches.home_team_id
+            JOIN teams AS away
+                ON away.id = matches.away_team_id
+            WHERE matches.competition_id = ?
+            ORDER BY matches.match_date
         """,
         (request.args.get("competition"),)
     ).fetchall()
 
-    return render_template("main/matches.html", competitions=competitions, matches=matches)
+    tournament = db.execute(
+        """
+            SELECT * FROM competitions
+            WHERE id = ?
+        """,
+        (request.args.get("competition"),)
+    ).fetchone()
+
+    return render_template("main/matches.html", competitions=competitions,
+                            matches=matches, 
+                            tournament=tournament)
+
+@bp.route('/match/<int:match_id>/make_bet', methods=('GET', 'POST'))
+@login_required
+def make_bet(match_id):
+    return "hello"

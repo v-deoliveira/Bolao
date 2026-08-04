@@ -8,6 +8,7 @@
     <div class="container mb-3 text-center">
         <form action="{{ url_for('main.matches') }}">
             <select class="form-select mx-auto w-auto" name="competition">
+                <option selected disabled>Choose a tournament</option>
                 {% for c in competitions %}
                     <option value="{{ c.id }}">{{ c.name }} {{ c.season }}</option>
                 {% endfor %}
@@ -15,6 +16,7 @@
             <button type="submit">Select</button>
         </form>
     </div>
+    <h4>{{ tournament.name }} {{ tournament.season }}</h4>
     {% if matches %}
         <table class="table table-hover">
             <thead class="table-primary">
@@ -27,6 +29,26 @@
                     <th class="text-end"></th>
                 </tr>
             </thead>
+            <tbody>
+                {% for match in matches %}
+                    <tr>
+                        <td class="text-start">{{ match.home_team }}</td>
+                        <td>{{ match.home_score }} x {{ match.away_score }}</td>
+                        <td>{{ match.away_team }}</td>
+                        <td>{{ match.match_date }}</td>
+                        {% if match.status == 0 %}
+                            <td>Not finished</td>
+                            <td>
+                                <form action="{{ url_for('main.make_bet', match_id=match['id'] )}}">
+                                    <button type="submit">BET</button>
+                                </form>
+                            </td>
+                        {% else %}
+                            <td>Finished</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
     {% endif %}
 {% endblock %}
