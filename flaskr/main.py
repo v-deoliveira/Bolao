@@ -55,8 +55,3 @@ def matches():
     return render_template("main/matches.html", competitions=competitions,
                             matches=matches, 
                             tournament=tournament)
-
-@bp.route('/match/<int:match_id>/make_bet', methods=('GET', 'POST'))
-@login_required
-def make_bet(match_id):
-    return "hello"

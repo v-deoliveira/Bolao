@@ -29,6 +29,9 @@ def create_app(test_config=None):
     from . import admin
     app.register_blueprint(admin.bp)
 
+    from . import predictions
+    app.register_blueprint(predictions.bp)
+
     from . import main
     app.register_blueprint(main.bp)
     app.add_url_rule('/', endpoint='index')
