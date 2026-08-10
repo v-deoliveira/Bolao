@@ -48,6 +48,7 @@ def index():
                            )
 
 @bp.route('/add_competition', methods=('GET', 'POST'))
+@admin_required
 def add_competition():
     db = get_db()
     if request.method == "POST":
@@ -64,6 +65,7 @@ def add_competition():
 
 
 @bp.route('/add_team', methods=('GET', 'POST'))
+@admin_required
 def add_team():
     db = get_db()
     if request.method == "POST":
@@ -79,6 +81,7 @@ def add_team():
     return redirect(url_for("admin.index"))
 
 @bp.route('/add_match', methods=('GET', 'POST'))
+@admin_required
 def add_match():
     db = get_db()
     if request.method == "POST":
