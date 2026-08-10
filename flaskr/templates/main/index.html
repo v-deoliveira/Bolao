@@ -4,16 +4,37 @@
     <h1>{% block title %}All games {% endblock %}</h1>
 {% endblock %}
 
+<!-- Still want to add tournament info into the table, or multiple tournaments  tables -->
 {% block content %}
-    <h3>List</h3>
-    <table class="table table-stripped">
-        <thead class="table-primary">
-            <tr>
-                <th class="start-text">Game</th>
-                <th class="text-end">Time</th>
-                <th class="text-end"></th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <h4>Your Predictions</h4>
+    {% if predictions %}
+        <table class="table table-hover">
+            <thead class="table-primary">
+                <tr>
+                    <th class="text-start">Home</th>
+                    <th class="text-start">Score</th>
+                    <th class="text-start">Away</th>
+                    <th class="text-start">Time</th>
+                    <th class="text-start">Status</th>
+                    <th class="text-start">Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for prediction in predictions %}
+                    <tr>
+                        <td class="text-start">{{ prediction.home_team }}</td>
+                        <td>{{ prediction.home_score }} x {{ prediction.away_score }}</td>
+                        <td>{{ prediction.away_team }}</td>
+                        <td>{{ prediction.match_date }}</td>
+                        {% if prediction.status == 0 %}
+                            <td>Not finished</td>
+                        {% else %}
+                            <td>Finished</td>
+                        {% endif %}
+                        <td>{{ prediction.points }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}

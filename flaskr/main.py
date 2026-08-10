@@ -10,7 +10,34 @@ bp = Blueprint('main', __name__)
 @login_required
 def index():
     db = get_db()
-    return render_template("main/index.html")
+
+    predictions = db.execute(
+        """
+            SELECT competitions.name AS tournament,
+                competitions.season AS season,
+                home.name AS home_team,
+                away.name AS away_team,
+                matches.id AS match_id,
+                predictions.home_score AS home_score,
+                predictions.away_score AS away_score,
+                matches.match_date AS match_date,
+                matches.status AS match_status,
+                predictions.points
+            FROM predictions
+            JOIN competitions
+                ON competitions.id = matches.competition_id
+            JOIN teams AS home
+                ON home.id = matches.home_team_id
+            JOIN teams AS away
+                ON away.id = matches.away_team_id
+            JOIN matches
+                ON matches.id = predictions.match_id
+            WHERE predictions.user_id = ?
+        """,
+        (g.user["id"],)   
+    ).fetchall()
+
+    return render_template("main/index.html", predictions=predictions)
 
 @bp.route('/matches', methods=('GET', 'POST'))
 @login_required
