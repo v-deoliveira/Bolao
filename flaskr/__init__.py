@@ -29,6 +29,9 @@ def create_app(test_config=None):
     from . import admin
     app.register_blueprint(admin.bp)
 
+    from . import admin_tournaments
+    app.register_blueprint(admin_tournaments.bp)
+
     from . import predictions
     app.register_blueprint(predictions.bp)
 
