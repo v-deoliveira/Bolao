@@ -27,7 +27,7 @@
                         <td>{{ prediction.away_team }}</td>
                         <td>{{ prediction.match_date }}</td>
                         <td>
-                        {% if prediction.status == 0 %}
+                        {% if prediction.status_finished == 0 %}
                             Not Started/On going
                         {% else %}
                             Match ended

@@ -30,9 +30,9 @@ def admin_required(view):
 def index():
     db = get_db()
 
-    competitions = db.execute(
+    tournaments = db.execute(
         """
-            SELECT * FROM competitions
+            SELECT * FROM tournaments
             ORDER BY name, season
         """
     ).fetchall()
@@ -45,23 +45,23 @@ def index():
     ).fetchall()
 
     return render_template("admin/admin.html", 
-                           competitions=competitions, 
+                           tournaments=tournaments, 
                            teams=teams 
                            )
 
-@bp.route('/add_competition', methods=('GET', 'POST'))
+@bp.route('/add_tournament', methods=('GET', 'POST'))
 @admin_required
-def add_competition():
+def add_tournament():
     db = get_db()
     if request.method == "POST":
         try:
             db.execute(
-                "INSERT INTO competitions (name, season) VALUES (?, ?)",
-                (request.form.get("competition"), request.form.get("season")),
+                "INSERT INTO tournaments (name, season) VALUES (?, ?)",
+                (request.form.get("tournament"), request.form.get("season")),
             )
             db.commit()
         except db.IntegrityError:
-            flash("Error")
+            flash("ERROR - Tournament already exists")
     
     return redirect(url_for("admin.index"))
 
@@ -87,16 +87,16 @@ def add_team():
 def add_match():
     db = get_db()
     if request.method == "POST":
-        competition = request.form.get("competition")
+        tournament = request.form.get("tournament")
         home_team = request.form.get("home_team")
         away_team = request.form.get("away_team")
         datetime = request.form.get("datetime")
         try:
             db.execute(
-                "INSERT INTO matches (competition_id," \
+                "INSERT INTO matches (tournament_id," \
                 "   home_team_id, away_team_id, match_date)" \
                 "   VALUES (?, ?, ?, ?)",
-                (competition, home_team, away_team, datetime)
+                (tournament, home_team, away_team, datetime)
             )
             db.commit()
         except db.IntegrityError:
@@ -104,18 +104,18 @@ def add_match():
 
     return redirect(url_for("admin.index"))
 
-@bp.route('/competition/<int:competition_id>/matches')
+@bp.route('/tournament/<int:tournament_id>/matches')
 @admin_required
-def matches(competition_id):
+def matches(tournament_id):
     db = get_db()
 
-    competition = db.execute(
+    tournament = db.execute(
         """
             SELECT name, season
-            FROM competitions
+            FROM tournaments
             WHERE id = ?
         """,
-        (competition_id,)
+        (tournament_id,)
     ).fetchone()
 
     matches = db.execute(
@@ -126,25 +126,25 @@ def matches(competition_id):
                 matches.home_score,
                 matches.away_score,
                 matches.match_date,
-                matches.status
+                matches.status_finished
             FROM matches
             JOIN teams AS home
                 ON home.id = matches.home_team_id
             JOIN teams AS away
                 ON away.id = matches.away_team_id
-            WHERE matches.competition_id = ?
+            WHERE matches.tournament_id = ?
             ORDER BY matches.match_date
         """,
-        (competition_id,)
+        (tournament_id,)
     ).fetchall() #Was getting a bug because forgot fetchall()
 
     return render_template("admin/matches.html", matches=matches, 
-                                                 competition=competition,
-                                                 competition_id=competition_id)
+                                                 tournament=tournament,
+                                                 tournament_id=tournament_id)
 
-@bp.route('/competition/<int:competition_id>/match/<int:match_id>/edit_match', methods=('GET', 'POST'))
+@bp.route('/tournament/<int:tournament_id>/match/<int:match_id>/edit_match', methods=('GET', 'POST'))
 @admin_required
-def edit_match(competition_id, match_id):
+def edit_match(tournament_id, match_id):
     db = get_db()
     if request.method == "POST":
         try:
@@ -152,11 +152,11 @@ def edit_match(competition_id, match_id):
             away_score = int(request.form.get("away_score"))
         except ValueError:
             flash("Invalid input. Must be a positive number.")
-            return redirect(url_for("admin.edit_match", competition_id=competition_id, match_id=match_id))
+            return redirect(url_for("admin.edit_match", tournament_id=tournament_id, match_id=match_id))
         # Checks for a positive int
         if home_score < 0 or away_score < 0:
             flash("Score must be positive")
-            return redirect(url_for("admin.edit_match", competition_id=competition_id, match_id=match_id))
+            return redirect(url_for("admin.edit_match", tournament_id=tournament_id, match_id=match_id))
 
         status_finished = 1
         db.execute(
@@ -164,7 +164,7 @@ def edit_match(competition_id, match_id):
                 UPDATE matches
                 SET home_score = ?,
                     away_score = ?,
-                    status = ?
+                    status_finished = ?
                 WHERE id = ?
             """,
             (home_score, away_score, status_finished, match_id)
@@ -192,7 +192,7 @@ def edit_match(competition_id, match_id):
             )
             db.commit()
 
-        return redirect(url_for("admin.matches", competition_id=competition_id))
+        return redirect(url_for("admin.matches", tournament_id=tournament_id))
     
     match = db.execute(
         """
@@ -201,7 +201,7 @@ def edit_match(competition_id, match_id):
                 matches.home_score,
                 matches.away_score,
                 matches.match_date,
-                matches.status
+                matches.status_finished
             FROM matches
             JOIN teams AS home
                 ON home.id = matches.home_team_id

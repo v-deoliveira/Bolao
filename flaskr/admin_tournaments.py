@@ -12,7 +12,7 @@ def manage_tournaments():
     db = get_db()
 
     tournaments = db.execute(
-        "SELECT * FROM competitions"
+        "SELECT * FROM tournaments"
     ).fetchall()
 
     return render_template("admin/tournaments.html", tournaments=tournaments)

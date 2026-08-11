@@ -13,19 +13,19 @@ def index():
 
     predictions = db.execute(
         """
-            SELECT competitions.name AS tournament,
-                competitions.season AS season,
+            SELECT tournaments.name AS tournament,
+                tournaments.season,
                 home.name AS home_team,
                 away.name AS away_team,
                 matches.id AS match_id,
                 predictions.home_score AS home_score,
                 predictions.away_score AS away_score,
                 matches.match_date,
-                matches.status,
+                matches.status_finished,
                 predictions.points
             FROM predictions
-            JOIN competitions
-                ON competitions.id = matches.competition_id
+            JOIN tournaments
+                ON tournaments.id = matches.tournament_id
             JOIN teams AS home
                 ON home.id = matches.home_team_id
             JOIN teams AS away
@@ -44,16 +44,22 @@ def index():
 def matches():
     db = get_db()
 
-    competitions = db.execute(
+    tournaments = db.execute(
         """
-            SELECT * FROM competitions
+            SELECT * FROM tournaments
             ORDER BY season
         """
     ).fetchall()
-    # When no tournament selected, tournament_id will be first tournament from competitions
-    tournament_id = request.args.get("competition")
+
+    # If no tournaments available(when database is empty) redirect to main.index with flash message
+    if not tournaments:
+        flash("No matches available yet.")
+        return redirect(url_for("main.index"))
+
+    # When no tournament selected, tournament_id will be first tournament from tournaments
+    tournament_id = request.args.get("tournament")
     if tournament_id is None:
-        tournament_id = competitions[0]["id"]
+        tournament_id = tournaments[0]["id"]
 
     matches = db.execute(
         """
@@ -63,13 +69,13 @@ def matches():
                 matches.home_score, 
                 matches.away_score, 
                 matches.match_date, 
-                matches.status
+                matches.status_finished
             FROM matches
             JOIN teams AS home
                 ON home.id = matches.home_team_id
             JOIN teams AS away
                 ON away.id = matches.away_team_id
-            WHERE matches.competition_id = ?
+            WHERE matches.tournament_id = ?
             ORDER BY matches.match_date
         """,
         (tournament_id,)
@@ -78,12 +84,12 @@ def matches():
     tournament = db.execute(
         """
             SELECT name, season
-            FROM competitions
+            FROM tournaments
             WHERE id = ?
         """,
         (tournament_id,)
     ).fetchone()
 
-    return render_template("main/matches.html", competitions=competitions,
+    return render_template("main/matches.html", tournaments=tournaments,
                             matches=matches, 
                             tournament=tournament)

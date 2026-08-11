@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block content %}
-    <h3>Create competition</h3>
-    <form action="{{ url_for('admin.add_competition') }}" method="post">
-         <input name="competition" id="competition" placeholder="Competition" type="text">
+    <h3>Create tournament</h3>
+    <form action="{{ url_for('admin.add_tournament') }}" method="post">
+         <input name="tournament" id="tournament" placeholder="Tournament" type="text">
          <input name="season" id="season" placeholder="Season" type="text">
          <button type="submit">Submit</button>
     </form>
@@ -20,9 +20,9 @@
 
     <h3>Add matches</h3>
     <form action="{{ url_for('admin.add_match') }}" method="post">
-        <select name="competition">
-            {% for c in competitions %}
-                <option value="{{ c.id }}">{{ c.name }} {{ c.season }}</option>
+        <select name="tournament">
+            {% for t in tournaments %}
+                <option value="{{ t.id }}">{{ t.name }} {{ t.season }}</option>
             {% endfor %}
         </select>
         <label for="home_team">Home</label>
@@ -44,11 +44,11 @@
     <h3>View All Matches</h3>
     <table>
         <tbody>
-            {% for c in competitions %}
+            {% for t in tournaments %}
                 <tr>
-                    <td>{{ c.name }} {{ c.season }}</td>
+                    <td>{{ t.name }} {{ t.season }}</td>
                     <td>
-                        <form action="{{ url_for('admin.matches', competition_id=c['id']) }}" method="GET">
+                        <form action="{{ url_for('admin.matches', tournament_id=t['id']) }}" method="GET">
                             <button type="submit">View</button>
                         </form>
                     </td>

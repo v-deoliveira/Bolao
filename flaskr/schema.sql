@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS predictions;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS teams;
-DROP TABLE IF EXISTS competitions;
+DROP TABLE IF EXISTS tournaments;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
@@ -11,10 +11,11 @@ CREATE TABLE users (
     is_admin INTEGER NOT NULL DEFAULT 0
 );
 
-CREATE TABLE competitions (
+CREATE TABLE tournaments (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
-    season TEXT NOT NULL
+    season TEXT NOT NULL,
+    UNIQUE(name, season)
 );
 
 CREATE TABLE teams (
@@ -24,15 +25,15 @@ CREATE TABLE teams (
 
 CREATE TABLE matches (
     id INTEGER PRIMARY KEY,
-    competition_id INTEGER NOT NULL,
+    tournament_id INTEGER NOT NULL,
     home_team_id INTEGER NOT NULL,
     away_team_id INTEGER NOT NULL,
     match_date DATETIME,
     home_score INTEGER,
     away_score INTEGER,
-    status INTEGER DEFAULT 0,
+    status_finished INTEGER DEFAULT 0,
 
-    FOREIGN KEY (competition_id) REFERENCES competitions (id) ON DELETE CASCADE,
+    FOREIGN KEY (tournament_id) REFERENCES tournaments (id) ON DELETE CASCADE,
     FOREIGN KEY (home_team_id) REFERENCES teams (id),
     FOREIGN KEY (away_team_id) REFERENCES teams (id)
 );

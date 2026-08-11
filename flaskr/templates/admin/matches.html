@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block header %}
-    <h2>{% block title %}{{ competition.name }} {{ competition.season }}{% endblock %}</h2>
+    <h2>{% block title %}{{ tournament.name }} {{ tournament.season }}{% endblock %}</h2>
 {% endblock %}
 
 
@@ -25,14 +25,14 @@
                     <td>{{ match.away_team }}</td>
                     <td>{{ match.match_date }}</td>
                     <td class="text-start">
-                        {% if match.status == 0 %}
+                        {% if match.status_finished == 0 %}
                             Not Started/On going
                         {% else %}
                             Match ended
                         {% endif %}
                     </td>
                     <td>
-                        <form action="{{ url_for('admin.edit_match', competition_id=competition_id, match_id=match['id']) }}" method="GET">
+                        <form action="{{ url_for('admin.edit_match', tournament_id=tournament_id, match_id=match['id']) }}" method="GET">
                             <button type="submit">Edit</button>
                         </form>
                     </td>

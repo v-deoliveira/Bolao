@@ -20,6 +20,10 @@ def make_bet(match_id):
         except ValueError:
             error = "Invalid input. Must be a positive number."
 
+        # Checks for a positive int
+        if home_score < 0 or away_score < 0:
+            error = "Score must be positive"
+
         if error is None:
             try:
                 db.execute(
@@ -30,7 +34,8 @@ def make_bet(match_id):
             except db.IntegrityError:
                 error = "You already have a bet for this match"
 
-        flash(error)
+        flash(error) if error is not None else flash("Bet placed successfully")
+        return redirect(url_for("main.matches"))
 
     match = db.execute(
         """
@@ -40,7 +45,7 @@ def make_bet(match_id):
                 matches.home_score, 
                 matches.away_score, 
                 matches.match_date, 
-                matches.status
+                matches.status_finished
             FROM matches
             JOIN teams AS home
                 ON home.id = matches.home_team_id

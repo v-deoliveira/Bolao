@@ -7,10 +7,10 @@
 {% block content %}
     <div class="container mb-3 text-center">
         <form action="{{ url_for('main.matches') }}">
-            <select class="form-select mx-auto w-auto" name="competition">
+            <select class="form-select mx-auto w-auto" name="tournament">
                 <option selected disabled>Select a tournament</option>
-                {% for c in competitions %}
-                    <option value="{{ c.id }}">{{ c.name }} {{ c.season }}</option>
+                {% for t in tournaments %}
+                    <option value="{{ t.id }}">{{ t.name }} {{ t.season }}</option>
                 {% endfor %}
             </select>
             <button type="submit">Select</button>
@@ -36,7 +36,7 @@
                         <td>{{ match.home_score }} x {{ match.away_score }}</td>
                         <td>{{ match.away_team }}</td>
                         <td>{{ match.match_date }}</td>
-                        {% if match.status == 0 %}
+                        {% if match.status_finished == 0 %}
                             <td>Not finished</td>
                             <td>
                                 <form action="{{ url_for('predictions.make_bet', match_id=match['id'] )}}">
