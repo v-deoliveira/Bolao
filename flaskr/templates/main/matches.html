@@ -8,7 +8,7 @@
     <div class="container mb-3 text-center">
         <form action="{{ url_for('main.matches') }}">
             <select class="form-select mx-auto w-auto" name="competition">
-                <option selected disabled>Choose a tournament</option>
+                <option selected disabled>Select a tournament</option>
                 {% for c in competitions %}
                     <option value="{{ c.id }}">{{ c.name }} {{ c.season }}</option>
                 {% endfor %}

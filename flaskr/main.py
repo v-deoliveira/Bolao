@@ -50,6 +50,10 @@ def matches():
             ORDER BY season
         """
     ).fetchall()
+    # When no tournament selected, tournament_id will be first tournament from competitions
+    tournament_id = request.args.get("competition")
+    if tournament_id is None:
+        tournament_id = competitions[0]["id"]
 
     matches = db.execute(
         """
@@ -68,15 +72,16 @@ def matches():
             WHERE matches.competition_id = ?
             ORDER BY matches.match_date
         """,
-        (request.args.get("competition"),)
+        (tournament_id,)
     ).fetchall()
 
     tournament = db.execute(
         """
-            SELECT * FROM competitions
+            SELECT name, season
+            FROM competitions
             WHERE id = ?
         """,
-        (request.args.get("competition"),)
+        (tournament_id,)
     ).fetchone()
 
     return render_template("main/matches.html", competitions=competitions,
