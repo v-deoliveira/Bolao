@@ -20,8 +20,8 @@ def index():
                 matches.id AS match_id,
                 predictions.home_score AS home_score,
                 predictions.away_score AS away_score,
-                matches.match_date AS match_date,
-                matches.status AS match_status,
+                matches.match_date,
+                matches.status,
                 predictions.points
             FROM predictions
             JOIN competitions

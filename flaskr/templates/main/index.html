@@ -26,11 +26,13 @@
                         <td>{{ prediction.home_score }} x {{ prediction.away_score }}</td>
                         <td>{{ prediction.away_team }}</td>
                         <td>{{ prediction.match_date }}</td>
+                        <td>
                         {% if prediction.status == 0 %}
-                            <td>Not finished</td>
+                            Not Started/On going
                         {% else %}
-                            <td>Finished</td>
+                            Match ended
                         {% endif %}
+                        </td>
                         <td>{{ prediction.points }}</td>
                     </tr>
                 {% endfor %}
