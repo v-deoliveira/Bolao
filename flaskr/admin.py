@@ -7,6 +7,8 @@ from werkzeug.exceptions import abort
 
 from flaskr.db import get_db
 
+from .helpers import calculate_points
+
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 def admin_required(view):
@@ -144,14 +146,19 @@ def matches(competition_id):
 @admin_required
 def edit_match(competition_id, match_id):
     db = get_db()
-
-    # I'LL NOT DO HERE USER INPUT CHECK, BECAUSE IT'S ADMIN RESTRICTED
     if request.method == "POST":
+        try:
+            home_score = int(request.form.get("home_score"))
+            away_score = int(request.form.get("away_score"))
+        except ValueError:
+            flash("Invalid input. Must be a positive number.")
+            return redirect(url_for("admin.edit_match", competition_id=competition_id, match_id=match_id))
+        # Checks for a positive int
+        if home_score < 0 or away_score < 0:
+            flash("Score must be positive")
+            return redirect(url_for("admin.edit_match", competition_id=competition_id, match_id=match_id))
 
-        home_score = request.form.get("home_score")
-        away_score = request.form.get("away_score")
-        status = request.form.get("status")
-
+        status_finished = 1
         db.execute(
             """
                 UPDATE matches
@@ -160,9 +167,31 @@ def edit_match(competition_id, match_id):
                     status = ?
                 WHERE id = ?
             """,
-            (home_score, away_score, status, match_id)
+            (home_score, away_score, status_finished, match_id)
         )
         db.commit()
+
+        predictions = db.execute(
+            """
+                SELECT id, home_score, away_score
+                FROM predictions
+                WHERE match_id = ?
+            """,
+            (match_id,)
+        ).fetchall()
+
+        for p in predictions:
+            pts = calculate_points(home_score, away_score, p["home_score"], p["away_score"])
+            db.execute(
+                """
+                    UPDATE predictions
+                    SET points = ?
+                    WHERE id = ?
+                """,
+                (pts, p["id"])
+            )
+            db.commit()
+
         return redirect(url_for("admin.matches", competition_id=competition_id))
     
     match = db.execute(
