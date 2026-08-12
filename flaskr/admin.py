@@ -49,22 +49,6 @@ def index():
                            teams=teams 
                            )
 
-@bp.route('/add_team', methods=('GET', 'POST'))
-@admin_required
-def add_team():
-    db = get_db()
-    if request.method == "POST":
-        try:
-            db.execute(
-                "INSERT INTO teams (name) VALUES (?)",
-                (request.form.get("team"),)
-            )
-            db.commit()
-        except db.IntegrityError:
-            flash("Team already exists")
-
-    return redirect(url_for("admin.index"))
-
 @bp.route('/add_match', methods=('GET', 'POST'))
 @admin_required
 def add_match():
