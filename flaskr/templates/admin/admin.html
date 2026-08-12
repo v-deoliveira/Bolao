@@ -5,13 +5,6 @@
 {% endblock %}
 
 {% block content %}
-    <h3>Create tournament</h3>
-    <form action="{{ url_for('admin.add_tournament') }}" method="post">
-         <input name="tournament" id="tournament" placeholder="Tournament" type="text">
-         <input name="season" id="season" placeholder="Season" type="text">
-         <button type="submit">Submit</button>
-    </form>
-
     <h3>Add teams</h3>
     <form action="{{ url_for('admin.add_team') }}" method="post">
         <input name="team" id="team" placeholder="Team name" type="text">

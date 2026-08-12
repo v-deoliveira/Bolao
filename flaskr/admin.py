@@ -49,23 +49,6 @@ def index():
                            teams=teams 
                            )
 
-@bp.route('/add_tournament', methods=('GET', 'POST'))
-@admin_required
-def add_tournament():
-    db = get_db()
-    if request.method == "POST":
-        try:
-            db.execute(
-                "INSERT INTO tournaments (name, season) VALUES (?, ?)",
-                (request.form.get("tournament"), request.form.get("season")),
-            )
-            db.commit()
-        except db.IntegrityError:
-            flash("ERROR - Tournament already exists")
-    
-    return redirect(url_for("admin.index"))
-
-
 @bp.route('/add_team', methods=('GET', 'POST'))
 @admin_required
 def add_team():
