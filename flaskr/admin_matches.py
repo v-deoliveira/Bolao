@@ -3,19 +3,19 @@ from flask import(
 )
 from .db import get_db
 from .admin import admin_required
-from .helpers import calculate_points
+from .helpers import calculate_points, delete_helper
 
 bp = Blueprint('admin_matches', __name__, url_prefix='/admin_matches')
+
+TABLE_NAME = "matches"
 
 @bp.route('/', methods=('GET', 'POST'))
 @admin_required
 def index():
     db = get_db()
-
     tournaments = db.execute(
         "SELECT * FROM tournaments ORDER BY name, season"
-    ).fetchall()
-    
+    ).fetchall() 
     teams = db.execute(
         "SELECT * FROM teams ORDER BY name"
     ).fetchall()
@@ -155,4 +155,8 @@ def edit(match_id):
     
     return render_template("admin/edit.html", match=match)
 
-
+@bp.route('/<int:match_id>/delete', methods=('POST',))
+@admin_required
+def delete(match_id):
+    flash("Match deleted") if delete_helper(match_id, TABLE_NAME) else flash("ERROR - FAILED TO DELETE MATCH")
+    return redirect(url_for("admin_matches.index"))

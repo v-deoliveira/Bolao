@@ -3,8 +3,11 @@ from flask import(
 )
 from .db import get_db
 from .admin import admin_required
+from .helpers import delete_helper
 
 bp = Blueprint('admin_tournaments', __name__, url_prefix='/admin_tournaments')
+
+TABLE_NAME = "tournaments"
 
 @bp.route('/', methods=('GET', 'POST'))
 @admin_required
@@ -39,14 +42,5 @@ def create():
 @bp.route('/<int:id>/delete', methods=('POST',))
 @admin_required
 def delete(id):
-    db = get_db()
-    try:
-        db.execute(
-            "DELETE FROM tournaments WHERE id = ?", (id,)
-        )
-        db.commit()
-        flash("Tournament deleted")
-    except db.IntegrityError:
-        flash("ERROR - Failed to delete tournament.")
-
+    flash("Tournament Deleted") if delete_helper(id, TABLE_NAME) else flash("ERROR - INVALID TOURNAMENT")
     return redirect(url_for("admin_tournaments.index"))

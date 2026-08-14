@@ -3,8 +3,11 @@ from flask import(
 )
 from .db import get_db
 from .admin import admin_required
+from .helpers import delete_helper
 
 bp = Blueprint('admin_teams', __name__, url_prefix='/admin_teams')
+
+TABLE_NAME = "teams"
 
 @bp.route('/', methods=('GET', 'POST'))
 @admin_required
@@ -33,24 +36,13 @@ def create():
 @admin_required
 def delete(id):
     db = get_db()
-    # Running 2 errors check. 1 for invalid team_id in the database.
-    # 2 if team is being used, what will fail a delete because of database structure.
-    error = None
+    # First check for a valid team_id. Then if delete_helper fails, team is being used.
     check_id = db.execute(
         "SELECT id FROM teams WHERE id = ?", (id,)
     ).fetchone()
-
     if not check_id:
         error = "ERROR - INVALID TEAM"
+        return redirect(url_for("admin_teams.index"))
 
-    if error is None:
-        try:
-            db.execute(
-                "DELETE FROM teams WHERE id = ?", (id,)
-            )
-            db.commit()
-        except db.IntegrityError:
-            error = ("ERROR - CURRENT TEAM IS BEING USED")
-
-    flash("Team deleted") if error is None else flash(error)
+    flash("Team Deleted") if delete_helper(id, TABLE_NAME) else flash("ERROR - TEAM BEING USED")
     return redirect(url_for("admin_teams.index"))
