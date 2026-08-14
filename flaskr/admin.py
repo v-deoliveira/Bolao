@@ -5,10 +5,6 @@ from flask import(
 )
 from werkzeug.exceptions import abort
 
-from flaskr.db import get_db
-
-from .helpers import calculate_points
-
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 def admin_required(view):
@@ -28,23 +24,4 @@ def admin_required(view):
 @bp.route('/', methods=('GET', 'POST'))
 @admin_required
 def index():
-    db = get_db()
-
-    tournaments = db.execute(
-        """
-            SELECT * FROM tournaments
-            ORDER BY name, season
-        """
-    ).fetchall()
-    
-    teams = db.execute(
-        """
-            SELECT * FROM teams
-            ORDER BY name
-        """
-    ).fetchall()
-
-    return render_template("admin/admin.html", 
-                           tournaments=tournaments, 
-                           teams=teams 
-                           )
+    return render_template("admin/admin.html")

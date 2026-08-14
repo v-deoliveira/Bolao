@@ -1,47 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block header %}
-    <h2>{% block title %}Admin page{% endblock %}</h2>
+    <h2>{% block title %}Admin Page{% endblock %}</h2>
 {% endblock %}
 
 {% block content %}
-    <h3>Add matches</h3>
-    <form action="{{ url_for('admin.add_match') }}" method="post">
-        <select name="tournament">
-            {% for t in tournaments %}
-                <option value="{{ t.id }}">{{ t.name }} {{ t.season }}</option>
-            {% endfor %}
-        </select>
-        <label for="home_team">Home</label>
-        <select name="home_team">
-            {% for t in teams %}
-                <option value="{{ t.id }}">{{ t.name }}</option>
-            {% endfor %}
-        </select>
-        <label for="away_team">Away</label>
-        <select name="away_team">
-            {% for t in teams %}
-                <option value="{{ t.id }}">{{ t.name }}</option>
-            {% endfor %}
-        </select>
-        <input name="datetime" type="datetime-local">
-        <button type="submit">Submit</button>
-    </form>
-
-    <h3>View All Matches</h3>
-    <table>
-        <tbody>
-            {% for t in tournaments %}
-                <tr>
-                    <td>{{ t.name }} {{ t.season }}</td>
-                    <td>
-                        <form action="{{ url_for('admin.matches', tournament_id=t['id']) }}" method="GET">
-                            <button type="submit">View</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
+    <ul>
+        <li><a href="{{ url_for('admin_tournaments.index') }}">Tournaments</a></li>
+        <li><a href="{{ url_for('admin_teams.index') }}">Teams</a></li>
+        <li><a href="{{ url_for('admin_matches.index') }}">Matches</a></li>
+    </ul>
 {% endblock %}
