@@ -1,43 +1,82 @@
 {% extends 'layout.html' %}
 
 {% block header %}
-    <h2>{% block title %}{{ tournament.name }} {{ tournament.season }}{% endblock %}</h2>
+    <h2>{% block title %}Matches management{% endblock %}</h2>
 {% endblock %}
 
 
 {% block content %}
-    <table class="table table-hover">
-        <thead class="table-primary">
-            <tr>
-                <th class="text-start">Home</th>
-                <th class="text-start">Score</th>
-                <th class="text-start">Away</th>
-                <th class="text-start">Time</th>
-                <th class="text-start">Status</th>
-                <th class="text-end"></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for match in matches %}
-                <tr>
-                    <td class="text-start">{{ match.home_team }}</td>
-                    <td class="text-start">{{ match.home_score }} x {{ match.away_score }}</td>
-                    <td>{{ match.away_team }}</td>
-                    <td>{{ match.match_date }}</td>
-                    <td class="text-start">
-                        {% if match.status_finished == 0 %}
-                            Not Started/On going
-                        {% else %}
-                            Match ended
-                        {% endif %}
-                    </td>
-                    <td>
-                        <form action="{{ url_for('admin.edit_match', tournament_id=tournament_id, match_id=match['id']) }}" method="GET">
-                            <button type="submit">Edit</button>
-                        </form>
-                    </td>
-                </tr>
+    <h3>Create Match</h3>
+    <form action="{{ url_for('admin_matches.create') }}" method="post">
+        <select name="tournament">
+            {% for t in tournaments %}
+                <option value="{{ t.id }}">{{ t.name }} {{ t.season }}</option>
             {% endfor %}
-        </tbody>
-    </table>
+        </select>
+        <label for="home_team">Home</label>
+        <select name="home_team">
+            <option selected disabled>Select Home</option>
+            {% for t in teams %}
+                <option value="{{ t.id }}">{{ t.name }}</option>
+            {% endfor %}
+        </select>
+        <label for="away_team">Away</label>
+        <select name="away_team">
+            <option selected disabled>Select Away</option>
+            {% for t in teams %}
+                <option value="{{ t.id }}">{{ t.name }}</option>
+            {% endfor %}
+        </select>
+        <input name="datetime" type="datetime-local">
+        <button type="submit">Submit</button>
+    </form>
+    <h3>View Matches</h3>
+    <div class="mb-3">
+        <form>
+            <select name="tournament_id">
+                <option selected disabled>Select a tournament</option>
+                {% for t in tournaments %}
+                    <option value="{{ t.id }}">{{ t.name }} {{ t.season }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">View Matches</button>
+        </form>
+    </div>
+    {% if matches %}
+        <h4>{{ selected_tournament.name }} {{ selected_tournament.season }}</h4>
+        <table class="table table-hover">
+            <thead class="table-primary">
+                <tr>
+                    <th class="text-start">Home</th>
+                    <th class="text-start">Score</th>
+                    <th class="text-start">Away</th>
+                    <th class="text-start">Time</th>
+                    <th class="text-start">Status</th>
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in matches %}
+                    <tr>
+                        <td class="text-start">{{ match.home_team }}</td>
+                        <td class="text-start">{{ match.home_score }} x {{ match.away_score }}</td>
+                        <td>{{ match.away_team }}</td>
+                        <td>{{ match.match_date }}</td>
+                        <td class="text-start">
+                            {% if match.status_finished == 0 %}
+                                Not Started/On going
+                            {% else %}
+                                Match ended
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form action="{{ url_for('admin_matches.edit', match_id=match['id']) }}">
+                                <button type="submit">Edit</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endblock %}

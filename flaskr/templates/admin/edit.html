@@ -10,7 +10,7 @@
 {% block content %}
 
     <div>
-        {% if match.status == 0 %}
+        {% if match.status_finished == 0 %}
             <p>Not started/on going</p>
         {% else %}
             <p>Score: {{ match.home_score }} x {{ match.away_score }}</p>
