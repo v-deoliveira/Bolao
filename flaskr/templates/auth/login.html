@@ -6,8 +6,9 @@
 
 {% block content %}
     <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <label for="username">Username</label>
-        <input autofocus name="username" id="username" type="text" required>
+        <input autofocus autocomplete="off" name="username" id="username" type="text" required>
         <label for="password">Password</label>
         <input type="password" name="password" id="password" required>
         <button type="submit">Log In</button>
