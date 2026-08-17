@@ -8,6 +8,7 @@
     <div class="container py-5 text-center">
         <h4>{{ match.home_team }} vs {{ match.away_team }}</h4>
         <form method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="mb-3">
                 <input class="form-control mx-auto w-auto" type="number" placeholder="Home Score" name="home_score" min="0" required>
             </div>
