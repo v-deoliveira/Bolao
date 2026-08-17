@@ -63,7 +63,7 @@ def create():
     home_id = request.form.get("home_team")
     away_id = request.form.get("away_team")
     match_date = request.form.get("datetime")
-    if match_date is None:
+    if not match_date:
         flash("Missing Match Date")
     else:
         try:
