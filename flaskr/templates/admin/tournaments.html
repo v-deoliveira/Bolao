@@ -7,9 +7,10 @@
 {% block content %}
     <h3>Create tournament</h3>
     <form action="{{ url_for('admin_tournaments.create') }}" method="post">
-         <input name="tournament" autocomplete="off" id="tournament" placeholder="Tournament" type="text">
-         <input name="season" autocomplete="off" id="season" placeholder="Season" type="text">
-         <button type="submit">Submit</button>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input name="tournament" autocomplete="off" id="tournament" placeholder="Tournament" type="text">
+        <input name="season" autocomplete="off" id="season" placeholder="Season" type="text">
+        <button type="submit">Submit</button>
     </form>
     <h3>Available Tournaments</h3>
     <table>
@@ -19,6 +20,7 @@
                     <td>{{ t.name }} {{ t.season }}</td>
                     <td>
                         <form action="{{ url_for('admin_tournaments.delete', id=t['id']) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit">Delete</button>
                         </form>
                     </td>

@@ -18,6 +18,7 @@
     </div>
     <h3>Update score</h3>
     <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <label for="home_score">{{ match.home_team }}</label>
         <input name="home_score" autocomplete="off" type="number" min="0" required>
         <label for="away_score">{{ match.away_team }}</label>

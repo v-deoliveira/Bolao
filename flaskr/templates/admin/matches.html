@@ -8,6 +8,7 @@
 {% block content %}
     <h3>Create Match</h3>
     <form action="{{ url_for('admin_matches.create') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <select name="tournament">
             {% for t in tournaments %}
                 <option value="{{ t.id }}">{{ t.name }} {{ t.season }}</option>
@@ -74,6 +75,7 @@
                                 <button type="submit">Edit</button>
                             </form>
                             <form action="{{ url_for('admin_matches.delete', match_id=match['id'] ) }}" method="post">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit">Delete</button>
                             </form>
                         </td>   
