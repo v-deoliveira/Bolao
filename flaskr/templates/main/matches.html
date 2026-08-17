@@ -17,7 +17,9 @@
         </form>
     </div>
     <h4>{{ tournament.name }} {{ tournament.season }}</h4>
-    {% if matches %}
+    {% if not matches %}
+        <p>No matches available for this tournament.</p>
+    {% else %}
         <table class="table table-hover">
             <thead class="table-primary">
                 <tr>
