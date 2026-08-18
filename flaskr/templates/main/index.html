@@ -15,7 +15,7 @@
                     <th class="text-start">Score</th>
                     <th class="text-start">Away</th>
                     <th class="text-start">Time</th>
-                    <th class="text-start">Status</th>
+                    <th class="text-start">Final Score</th>
                     <th class="text-start">Points</th>
                 </tr>
             </thead>
@@ -27,10 +27,10 @@
                         <td>{{ prediction.away_team }}</td>
                         <td>{{ prediction.match_date }}</td>
                         <td>
-                        {% if prediction.status_finished == 0 %}
-                            Not Started/On going
+                        {% if prediction.status_finished %}
+                            {{prediction.final_home_score}} x {{prediction.final_away_score}}
                         {% else %}
-                            Match ended
+                            Not Started/On going
                         {% endif %}
                         </td>
                         <td>{{ prediction.points }}</td>
