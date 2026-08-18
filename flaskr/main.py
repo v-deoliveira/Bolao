@@ -93,3 +93,22 @@ def matches():
     return render_template("main/matches.html", tournaments=tournaments,
                             matches=matches, 
                             tournament=tournament)
+
+@bp.route('/ranking', methods=('GET', 'POST'))
+@login_required
+def ranking():
+    db = get_db()
+    # Let's keep a limit of 10 users in the ranking, for now.
+    users = db.execute(
+        """
+            SELECT users.username,
+                COALESCE(SUM (predictions.points), 0) AS points
+            FROM users
+            LEFT JOIN predictions
+                ON predictions.user_id = users.id
+            GROUP BY users.username
+            ORDER BY points DESC
+            LIMIT 10
+        """
+    ).fetchall()
+    return render_template("main/ranking.html", users=users)
