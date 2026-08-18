@@ -1,4 +1,4 @@
-from . db import get_db
+from .db import get_db
 
 def outcome(home_score, away_score):
     if home_score > away_score:

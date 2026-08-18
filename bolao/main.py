@@ -1,8 +1,8 @@
 from flask import(
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
-from . auth import login_required
-from . db import get_db
+from .auth import login_required
+from .db import get_db
 
 bp = Blueprint('main', __name__)
 
