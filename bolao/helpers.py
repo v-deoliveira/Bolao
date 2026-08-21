@@ -15,12 +15,19 @@ def calculate_points(match_home, match_away, bet_home, bet_away):
         return 1
     return 0
 
+# Using the approach of prebuilt queries, so the value of table_name will be filtered by _DELETE_QUERIES
+_DELETE_QUERIES = {
+    "matches": "DELETE FROM matches WHERE id = ?",
+    "teams": "DELETE FROM teams WHERE id = ?",
+    "tournaments": "DELETE FROM tournaments WHERE id = ?",
+}
 def delete_helper(id, table_name):
+    query = _DELETE_QUERIES.get(table_name)
+    if query is None:
+        raise ValueError(f"Unknown table: {table_name}")
     db = get_db()
     try:
-        db.execute(
-            f"DELETE FROM {table_name} WHERE id = ?", (id,)
-        )
+        db.execute(query, (id,))
         db.commit()
         return True
     except db.IntegrityError:
