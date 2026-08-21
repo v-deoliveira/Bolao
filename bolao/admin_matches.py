@@ -111,11 +111,11 @@ def edit(match_id):
             away_score = int(request.form.get("away_score"))
         except ValueError:
             flash("Invalid input. Must be a positive number.")
-            return redirect(url_for("admin.edit_match", match_id=match_id))
+            return redirect(url_for("admin_matches.edit", match_id=match_id))
         # Then check for a positive int
         if home_score < 0 or away_score < 0:
             flash("Score must be positive")
-            return redirect(url_for("admin.edit_match", match_id=match_id))
+            return redirect(url_for("admin_matches.edit", match_id=match_id))
 
         status_finished = 1
         db.execute(
