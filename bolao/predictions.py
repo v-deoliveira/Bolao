@@ -9,30 +9,29 @@ bp = Blueprint('predictions', __name__, url_prefix='/predictions')
 @bp.route('/match/<int:match_id>/make_bet', methods=('GET', 'POST'))
 @login_required
 def make_bet(match_id):
-
     db = get_db()
-
     if request.method == "POST":
-        error = None
         try:
             home_score = int(request.form.get("home_score"))
             away_score = int(request.form.get("away_score"))
         except ValueError:
-            error = "Invalid input. Must be a positive number."
+            flash("Invalid input. Must be a positive number.")
+            return redirect(url_for("predictions.make_bet", match_id=match_id))
 
         # Checks for a positive int
         if home_score < 0 or away_score < 0:
-            error = "Score must be positive"
-
-        if error is None:
-            try:
-                db.execute(
-                    "INSERT INTO predictions (user_id, match_id, home_score, away_score) VALUES (?, ?, ?, ?)",
-                    (g.user["id"], match_id, home_score, away_score),
-                )
-                db.commit()
-            except db.IntegrityError:
-                error = "You already have a bet for this match"
+           flash("Score must be positive")
+           return redirect(url_for("predictions.make_bet", match_id=match_id))
+        
+        error = None
+        try:
+            db.execute(
+                "INSERT INTO predictions (user_id, match_id, home_score, away_score) VALUES (?, ?, ?, ?)",
+                (g.user["id"], match_id, home_score, away_score),
+            )
+            db.commit()
+        except db.IntegrityError:
+            error = "You already have a bet for this match"
 
         flash(error) if error is not None else flash("Bet placed successfully")
         return redirect(url_for("main.matches"))
