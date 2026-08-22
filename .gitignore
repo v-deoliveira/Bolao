@@ -1,6 +1,7 @@
 .coverage
 .pytest_cache
 .venv/
+bolao.zip
 instance/
 __pycache__/
 personal_notes/
