@@ -1,7 +1,9 @@
 DROP TABLE IF EXISTS predictions;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS teams;
+DROP TABLE IF EXISTS seasons;
 DROP TABLE IF EXISTS tournaments;
+DROP TABLE IF EXISTS areas;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
@@ -11,11 +13,30 @@ CREATE TABLE users (
     is_admin INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE areas (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    code TEXT NOT NULL,
+    flag TEXT,
+    parent_area_id INTEGER REFERENCES areas(id)
+);
+
 CREATE TABLE tournaments (
     id INTEGER PRIMARY KEY,
+    api_id INTEGER NOT NULL UNIQUE,
+    area_id INTEGER NOT NULL REFERENCES areas(id),
     name TEXT NOT NULL,
-    season TEXT NOT NULL,
-    UNIQUE(name, season)
+    code TEXT NOT NULL,
+    type TEXT NOT NULL,
+    emblem TEXT
+);
+
+CREATE TABLE seasons (
+    id INTEGER PRIMARY KEY,
+    api_id INTEGER UNIQUE NOT NULL,
+    tournament_id INTEGER NOT NULL REFERENCES tournaments(id),
+    start_date TEXT,
+    end_date TEXT
 );
 
 CREATE TABLE teams (
