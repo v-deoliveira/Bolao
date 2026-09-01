@@ -10,4 +10,8 @@
         <li><a href="{{ url_for('admin_teams.index') }}">Teams</a></li>
         <li><a href="{{ url_for('admin_matches.index') }}">Matches</a></li>
     </ul>
+    <form action="{{ url_for('admin_api.sync') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit">Sync</button>
+    </form>
 {% endblock %}
