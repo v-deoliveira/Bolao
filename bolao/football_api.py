@@ -10,7 +10,10 @@ def _get(path, params=None):
     return response.json()
 
 def  get_competitions():
-    return _get("/competitions")
+    data = _get("/competitions")
+    return data["competitions"]
 
 def get_matches(competition_id, **params):
-    return _get(f"/competitions/{competition_id}/matches", params=params) #params here can be season, dateFrom, dateTo, matchday, status, stage, group, etc.
+    data = _get(f"/competitions/{competition_id}/matches", params=params) #params here can be season, dateFrom, dateTo, matchday, status, stage, group, etc.
+    return data["matches"]
+
