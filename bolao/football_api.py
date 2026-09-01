@@ -17,3 +17,6 @@ def get_matches(competition_id, **params):
     data = _get(f"/competitions/{competition_id}/matches", params=params) #params here can be season, dateFrom, dateTo, matchday, status, stage, group, etc.
     return data["matches"]
 
+def get_areas(competitions):
+    areas = [c["area"] for c in competitions]
+    return areas
