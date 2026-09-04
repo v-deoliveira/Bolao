@@ -13,6 +13,7 @@ bp = Blueprint('admin_api', __name__, url_prefix='/admin_api')
 @bp.route('/sync', methods=('POST',))
 @admin_required
 def sync():
+    db = get_db()
     #Will request the API's competitions, and from it grab the 'areas' data.
     #Two except blocks. They will not collide, because each handles a very distinc error type.
     try:
@@ -25,8 +26,8 @@ def sync():
         flash(f"Unexpect API response - a competition is missing a field: {e}")
         return redirect(url_for("admin.index"))
 
+    # I choose to use distinct try/except here, for better code maintance. In case of errors, is easy to catch where is it.
     try:
-        db = get_db()
         for area in areas:
             db.execute(
                 """
@@ -38,7 +39,24 @@ def sync():
             )
         db.commit()
         flash("All areas synced")
-        return redirect(url_for("admin.index"))
     except db.IntegrityError as e:
         flash(f"The API's response is missing data: {e}")
         return redirect(url_for("admin.index"))
+
+    try:
+        for comp in response:
+            db.execute(
+                """
+                    INSERT INTO tournaments (api_id, area_id, name, code, type, emblem) VALUES (?, ?, ?, ?, ?, ?)
+                    ON CONFLICT (api_id) DO NOTHING
+                """,
+                (comp.get("id"), comp.get("area", {}).get("id"), comp.get("name"), comp.get("code"), comp.get("type"), comp.get("emblem")),
+                # Add to .get("area") default value of {}, cuase if .get("area") returns None, .get("id") wont break and throw unexpected error.
+            )
+        db.commit()
+        flash("All competitions synced")
+    except db.IntegrityError as e:
+        flash(f"The API's response is missing data: {e}")
+        return redirect(url_for("admin.index"))
+
+    return redirect(url_for("admin.index"))
