@@ -25,4 +25,20 @@ def sync():
         flash(f"Unexpect API response - a competition is missing a field: {e}")
         return redirect(url_for("admin.index"))
 
-    return areas
+    try:
+        db = get_db()
+        for area in areas:
+            db.execute(
+                """
+                    INSERT INTO areas (code, name, id, flag) VALUES (?, ?, ?, ?)
+                    ON CONFLICT (id) DO NOTHING
+                """,
+                (area.get("code"), area.get("name"), area.get("id"), area.get("flag")),
+                #Using .get() here for handle not only missing necessary values, but also any missing key.
+            )
+        db.commit()
+        flash("All areas synced")
+        return redirect(url_for("admin.index"))
+    except db.IntegrityError as e:
+        flash(f"The API's response is missing data: {e}")
+        return redirect(url_for("admin.index"))
