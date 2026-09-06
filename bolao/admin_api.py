@@ -47,8 +47,8 @@ def sync():
         for comp in response:
             db.execute(
                 """
-                    INSERT INTO tournaments (api_id, area_id, name, code, type, emblem) VALUES (?, ?, ?, ?, ?, ?)
-                    ON CONFLICT (api_id) DO NOTHING
+                    INSERT INTO tournaments (id, area_id, name, code, type, emblem) VALUES (?, ?, ?, ?, ?, ?)
+                    ON CONFLICT (id) DO NOTHING
                 """,
                 (comp.get("id"), comp.get("area", {}).get("id"), comp.get("name"), comp.get("code"), comp.get("type"), comp.get("emblem")),
                 # Add to .get("area") default value of {}, cuase if .get("area") returns None, .get("id") wont break and throw unexpected error.

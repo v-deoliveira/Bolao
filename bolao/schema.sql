@@ -23,7 +23,6 @@ CREATE TABLE areas (
 
 CREATE TABLE tournaments (
     id INTEGER PRIMARY KEY,
-    api_id INTEGER NOT NULL UNIQUE,
     area_id INTEGER NOT NULL REFERENCES areas(id),
     name TEXT NOT NULL,
     code TEXT NOT NULL,
