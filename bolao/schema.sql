@@ -32,7 +32,6 @@ CREATE TABLE tournaments (
 
 CREATE TABLE seasons (
     id INTEGER PRIMARY KEY,
-    api_id INTEGER UNIQUE NOT NULL,
     tournament_id INTEGER NOT NULL REFERENCES tournaments(id),
     start_date TEXT,
     end_date TEXT
