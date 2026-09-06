@@ -53,9 +53,22 @@ def sync():
                 (comp.get("id"), comp.get("area", {}).get("id"), comp.get("name"), comp.get("code"), comp.get("type"), comp.get("emblem")),
                 # Add to .get("area") default value of {}, cuase if .get("area") returns None, .get("id") wont break and throw unexpected error.
             )
+
+            # If currentSeason is missing, raise KeyError, because db.IntegrityError will not catch it.
+            current_season = comp.get("currentSeason")
+            if current_season is None:
+                raise KeyError(f"Competition {comp.get('name')} has no currentSeason")
+            
+            db.execute(
+                """
+                    INSERT INTO seasons (tournament_id, end_date, id, start_date) VALUES (?, ?, ?, ?)
+                    ON CONFLICT (id) DO NOTHING
+                """,
+                (comp.get("id"), current_season.get("endDate"), current_season.get("id"), current_season.get("start_date")),
+            )
         db.commit()
-        flash("All competitions synced")
-    except db.IntegrityError as e:
+        flash("All competitions and seasons synced")
+    except (db.IntegrityError, KeyError) as e:
         flash(f"The API's response is missing data: {e}")
         return redirect(url_for("admin.index"))
 
