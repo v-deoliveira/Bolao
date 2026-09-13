@@ -36,3 +36,7 @@ def get_teams(competition_id):
             """,
             (team.get('crest'), team.get('id'), team.get('name'), team.get('shortName'), team.get('tla')),
         )
+
+def test(id):
+    data = _get(f"/competitions/{id}/teams")
+    return data
