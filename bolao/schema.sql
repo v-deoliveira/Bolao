@@ -39,7 +39,10 @@ CREATE TABLE seasons (
 
 CREATE TABLE teams (
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL
+    name TEXT NOT NULL,
+    short_name TEXT,
+    tla TEXT NOT NULL,
+    crest TEXT
 );
 
 CREATE TABLE matches (
