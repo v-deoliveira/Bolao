@@ -37,6 +37,30 @@ def get_teams(competition_id):
             (team.get('crest'), team.get('id'), team.get('name'), team.get('shortName'), team.get('tla')),
         )
 
-def test(id):
-    data = _get(f"/competitions/{id}/teams")
-    return data
+
+def create_matches(matches):
+    db = get_db()
+    for match in matches:
+        if match.get('id') is None:
+            raise KeyError("API RESPONSE MISSING MATCH ID")
+        
+        away_id = match.get('awayTeam', {}).get('id')
+        home_id = match.get('homeTeam', {}).get('id')
+        season_id = match.get('season', {}).get('id')
+
+        if away_id is None or home_id is None:
+            raise KeyError(f"MATCH (id: {match.get('id')}) MISSING A TEAM'S ID.")
+        if season_id is None:
+            raise KeyError(f"MATCH (id: {match.get('id')}) MISSING SEASON'S ID.")
+
+        score = match.get('score', {}).get('fullTime')
+
+        db.execute(
+            """
+                INSERT INTO matches (away_team, home_team, group_name, id, matchday, away_score, home_score, season_id, stage, status, utc_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (id) DO NOTHING
+            """,
+            (away_id, home_id, match.get('group'), match.get('id'), match.get('matchday'), score.get('away'), score.get('home'), season_id, match.get('stage'), match.get('status'), match.get('utcDate')),
+        )
+

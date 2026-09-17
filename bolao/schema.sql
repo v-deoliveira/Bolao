@@ -47,17 +47,16 @@ CREATE TABLE teams (
 
 CREATE TABLE matches (
     id INTEGER PRIMARY KEY,
-    tournament_id INTEGER NOT NULL,
-    home_team_id INTEGER NOT NULL,
-    away_team_id INTEGER NOT NULL,
-    match_date DATETIME,
+    season_id INTEGER NOT NULL REFERENCES seasons(id),
+    utc_date TEXT,
+    status TEXT NOT NULL,
+    matchday INTEGER,
+    stage TEXT NOT NULL,
+    group_name TEXT,
+    home_team INTEGER NOT NULL REFERENCES teams(id),
+    away_team INTEGER NOT NULL REFERENCES teams(id),
     home_score INTEGER,
-    away_score INTEGER,
-    status_finished INTEGER DEFAULT 0,
-
-    FOREIGN KEY (tournament_id) REFERENCES tournaments (id) ON DELETE CASCADE,
-    FOREIGN KEY (home_team_id) REFERENCES teams (id),
-    FOREIGN KEY (away_team_id) REFERENCES teams (id)
+    away_score INTEGER
 );
 
 CREATE TABLE predictions (
