@@ -4,7 +4,7 @@ from flask import(
 from .db import get_db
 from .admin import admin_required
 from .football_api import(
-    get_competitions, get_matches, get_areas
+    get_competitions, get_matches, get_areas, get_teams, create_matches
 )
 import requests
 
@@ -45,6 +45,7 @@ def sync():
 
     try:
         for comp in response:
+            # PERHAPS NEED A CHECK FOR MISSING ID, BECAUSE INTEGRITYERROR WILL NOT CATCH IT, AND THE INSERT WILL FAIL SILENTLY.
             db.execute(
                 """
                     INSERT INTO tournaments (id, area_id, name, code, type, emblem) VALUES (?, ?, ?, ?, ?, ?)
@@ -73,3 +74,25 @@ def sync():
         return redirect(url_for("admin.index"))
 
     return redirect(url_for("admin.index"))
+
+
+# This route will first sync all teams from the selected competition, and then sync the matches.
+# We first need the teams, because the matches table references the teams id on the teams table.
+@bp.route('/<int:id>/sync_matches', methods=('POST',))
+@admin_required
+def sync_matches(id):
+    db = get_db()
+    try:
+        get_teams(id)
+        matches = get_matches(id)
+        create_matches(matches)
+        db.commit()
+        flash("Teams and matches synced")
+    except requests.exceptions.RequestException as e:
+        flash(f"Could not reach the API: {e}")
+        return redirect(url_for("admin_tournaments.index"))
+    except (db.IntegrityError, KeyError) as e:
+        flash(f"The API's response is missing data: {e}")
+        return redirect(url_for('admin_tournaments.index'))
+
+    return redirect(url_for('admin_tournaments.index'))
