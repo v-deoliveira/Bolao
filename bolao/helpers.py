@@ -15,6 +15,13 @@ def calculate_points(match_home, match_away, bet_home, bet_away):
         return 1
     return 0
 
+
+def format_season(season):
+    if season['start_date'][:4] != season['end_date'][:4]:
+        return f"{season['start_date'][:4]}/{season['end_date'][2:4]}"
+    else:
+        return f"{season['start_date'][:4]}"
+
 # Using the approach of prebuilt queries, so the value of table_name will be filtered by _DELETE_QUERIES
 _DELETE_QUERIES = {
     "matches": "DELETE FROM matches WHERE id = ?",
