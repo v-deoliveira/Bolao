@@ -8,15 +8,27 @@
     <div class="container mb-3 text-center">
         <form action="{{ url_for('main.matches') }}">
             <select class="form-select mx-auto w-auto" name="tournament">
-                <option selected disabled>Select a tournament</option>
+                {% if tournament %}
+                    <option selected disabled>{{ tournament.name }}</option>
+                {% endif %}
                 {% for t in tournaments %}
-                    <option value="{{ t.id }}">{{ t.name }} {{ t.season }}</option>
+                    <option value="{{ t.id }}">{{ t.name }}</option>
                 {% endfor %}
             </select>
             <button type="submit">Select</button>
         </form>
     </div>
-    <h4>{{ tournament.name }} {{ tournament.season }}</h4>
+    <div>
+        <h4>{{ tournament.name }}</h4>
+        <form action="{{ url_for('main.matches') }}">
+            <select name="season">
+                {% for s in seasons %}
+                    <option value="{{ s.id }}">{{ s.formated_season }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Select</button>
+        </form>
+    </div>
     {% if not matches %}
         <p>No matches available for this tournament.</p>
     {% else %}
@@ -37,16 +49,18 @@
                         <td class="text-start">{{ match.home_team }}</td>
                         <td>{{ match.home_score }} x {{ match.away_score }}</td>
                         <td>{{ match.away_team }}</td>
-                        <td>{{ match.match_date }}</td>
-                        {% if match.status_finished == 0 %}
-                            <td>Not finished</td>
+                        <td>{{ match.utc_date }}</td>
+                        {% if match.status == 'SCHEDULED' or match.status == 'TIMED' %}
+                            <td>{{ match.status }}</td>
                             <td>
                                 <form action="{{ url_for('predictions.make_bet', match_id=match['id'] )}}">
                                     <button type="submit">BET</button>
                                 </form>
                             </td>
+                        {% elif match.status == 'FINISHED' %}
+                            <td>FT</td>
                         {% else %}
-                            <td>Finished</td>
+                            <td>{{ match.status }}</td>
                         {% endif %}
                     </tr>
                 {% endfor %}

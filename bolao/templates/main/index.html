@@ -25,12 +25,12 @@
                         <td class="text-start">{{ prediction.home_team }}</td>
                         <td>{{ prediction.home_score }} x {{ prediction.away_score }}</td>
                         <td>{{ prediction.away_team }}</td>
-                        <td>{{ prediction.match_date }}</td>
+                        <td>{{ prediction.utc_date }}</td>
                         <td>
-                        {% if prediction.status_finished %}
-                            {{prediction.final_home_score}} x {{prediction.final_away_score}}
+                        {% if prediction.status == 'FINISHED' %}
+                            {{prediction.ft_home_score}} x {{prediction.ft_away_score}}
                         {% else %}
-                            Not Started/On going
+                            {{ prediction.status }}
                         {% endif %}
                         </td>
                         <td>{{ prediction.points }}</td>
