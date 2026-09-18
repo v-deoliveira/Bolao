@@ -3,6 +3,7 @@ from flask import(
 )
 from .auth import login_required
 from .db import get_db
+from .helpers import format_season
 
 bp = Blueprint('main', __name__)
 
@@ -18,16 +19,16 @@ def index():
                 matches.id AS match_id,
                 predictions.home_score AS home_score,
                 predictions.away_score AS away_score,
-                matches.match_date,
-                matches.status_finished,
+                matches.utc_date,
+                matches.status,
                 predictions.points,
-                matches.home_score AS final_home_score,
-                matches.away_score AS final_away_score
+                matches.home_score AS ft_home_score,
+                matches.away_score AS ft_away_score
             FROM predictions
             JOIN teams AS home
-                ON home.id = matches.home_team_id
+                ON home.id = matches.home_team
             JOIN teams AS away
-                ON away.id = matches.away_team_id
+                ON away.id = matches.away_team
             JOIN matches
                 ON matches.id = predictions.match_id
             WHERE predictions.user_id = ?
@@ -37,7 +38,7 @@ def index():
 
     return render_template("main/index.html", predictions=predictions)
 
-@bp.route('/matches', methods=('GET', 'POST'))
+@bp.route('/matches', methods=('GET',))
 @login_required
 def matches():
     db = get_db()
@@ -45,7 +46,6 @@ def matches():
     tournaments = db.execute(
         """
             SELECT * FROM tournaments
-            ORDER BY season
         """
     ).fetchall()
 
@@ -59,6 +59,18 @@ def matches():
     if tournament_id is None:
         tournament_id = tournaments[0]["id"]
 
+    seasons = db.execute(
+        "SELECT * FROM seasons WHERE tournament_id = ? ORDER BY start_date DESC",
+        (tournament_id,)
+    ).fetchall()
+    seasons = [dict(s) for s in seasons]
+    for s in seasons:
+        s['formated_season'] = format_season(s)
+    
+    selected_season_id = request.args.get("season")
+    if selected_season_id is None:
+        selected_season_id = seasons[0]['id']
+
     matches = db.execute(
         """
             SELECT home.name AS home_team, 
@@ -66,22 +78,23 @@ def matches():
                 matches.id, 
                 matches.home_score, 
                 matches.away_score, 
-                matches.match_date, 
-                matches.status_finished
+                matches.utc_date, 
+                matches.status,
+                matches.matchday
             FROM matches
             JOIN teams AS home
-                ON home.id = matches.home_team_id
+                ON home.id = matches.home_team
             JOIN teams AS away
-                ON away.id = matches.away_team_id
-            WHERE matches.tournament_id = ?
-            ORDER BY matches.match_date
+                ON away.id = matches.away_team
+            WHERE matches.season_id = ?
+            ORDER BY matches.utc_date, matches.matchday
         """,
-        (tournament_id,)
+        (selected_season_id,)
     ).fetchall()
 
     tournament = db.execute(
         """
-            SELECT name, season
+            SELECT name, code, type, emblem
             FROM tournaments
             WHERE id = ?
         """,
@@ -90,7 +103,9 @@ def matches():
 
     return render_template("main/matches.html", tournaments=tournaments,
                             matches=matches, 
-                            tournament=tournament)
+                            tournament=tournament,
+                            seasons=seasons)
+
 
 @bp.route('/ranking', methods=('GET', 'POST'))
 @login_required

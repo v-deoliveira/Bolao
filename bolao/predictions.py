@@ -43,13 +43,13 @@ def make_bet(match_id):
                 matches.id, 
                 matches.home_score, 
                 matches.away_score, 
-                matches.match_date, 
-                matches.status_finished
+                matches.utc_date, 
+                matches.status
             FROM matches
             JOIN teams AS home
-                ON home.id = matches.home_team_id
+                ON home.id = matches.home_team
             JOIN teams AS away
-                ON away.id = matches.away_team_id
+                ON away.id = matches.away_team
             WHERE matches.id = ?
         """,
         (match_id,)
