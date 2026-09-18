@@ -96,3 +96,10 @@ def sync_matches(id):
         return redirect(url_for('admin_tournaments.index'))
 
     return redirect(url_for('admin_tournaments.index'))
+
+@bp.route('/test', methods=('GET', 'POST'))
+@admin_required
+def test():
+    id = '2000'
+    data = get_matches(id)
+    return data
