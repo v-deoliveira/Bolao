@@ -65,7 +65,7 @@ def sync():
                     INSERT INTO seasons (tournament_id, end_date, id, start_date) VALUES (?, ?, ?, ?)
                     ON CONFLICT (id) DO NOTHING
                 """,
-                (comp.get("id"), current_season.get("endDate"), current_season.get("id"), current_season.get("start_date")),
+                (comp.get("id"), current_season.get("endDate"), current_season.get("id"), current_season.get("startDate")),
             )
         db.commit()
         flash("All competitions and seasons synced")
