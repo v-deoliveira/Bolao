@@ -1,4 +1,5 @@
 from .db import get_db
+from datetime import datetime
 
 def outcome(home_score, away_score):
     if home_score > away_score:
@@ -21,6 +22,13 @@ def format_season(season):
         return f"{season['start_date'][:4]}/{season['end_date'][2:4]}"
     else:
         return f"{season['start_date'][:4]}"
+
+
+# Format the api's date format to a better user readable format. It will be called from the template itself,
+# with the option to add a custom format, if needed.
+def format_datetime(value, fmt="%d %b %Y, %H:%M"):
+    dt = datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+    return dt.strftime(fmt)
 
 # Using the approach of prebuilt queries, so the value of table_name will be filtered by _DELETE_QUERIES
 _DELETE_QUERIES = {

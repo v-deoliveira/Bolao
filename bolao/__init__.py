@@ -2,11 +2,16 @@ import os
 
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
+from .helpers import format_datetime
 
 def create_app(test_config=None):
     # create and config app
     app = Flask(__name__, instance_relative_config=True)
     csrf = CSRFProtect(app)
+
+    # Add custom made filters to jinja
+    app.jinja_env.filters['format_datetime'] = format_datetime
+
     app.config.from_mapping(
         SECRET_KEY='dev' ,
         DATABASE=os.path.join(app.instance_path, 'bolao.sqlite'),
