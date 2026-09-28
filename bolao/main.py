@@ -3,7 +3,6 @@ from flask import(
 )
 from .auth import login_required
 from .db import get_db
-from .helpers import format_season
 
 bp = Blueprint('main', __name__)
 
@@ -63,9 +62,6 @@ def matches():
         "SELECT * FROM seasons WHERE tournament_id = ? ORDER BY start_date DESC",
         (tournament_id,)
     ).fetchall()
-    seasons = [dict(s) for s in seasons]
-    for s in seasons:
-        s['formated_season'] = format_season(s)
     
     selected_season_id = request.args.get("season")
     if selected_season_id is None:

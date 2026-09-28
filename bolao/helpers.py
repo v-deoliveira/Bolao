@@ -17,7 +17,7 @@ def calculate_points(match_home, match_away, bet_home, bet_away):
     return 0
 
 
-def format_season(season):
+def format_season_label(season):
     if season['start_date'][:4] != season['end_date'][:4]:
         return f"{season['start_date'][:4]}/{season['end_date'][2:4]}"
     else:

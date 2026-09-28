@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
-from .helpers import format_datetime
+from .helpers import format_datetime, format_season_label
 
 def create_app(test_config=None):
     # create and config app
@@ -11,6 +11,7 @@ def create_app(test_config=None):
 
     # Add custom made filters to jinja
     app.jinja_env.filters['format_datetime'] = format_datetime
+    app.jinja_env.globals['season_label'] = format_season_label
 
     app.config.from_mapping(
         SECRET_KEY='dev' ,
