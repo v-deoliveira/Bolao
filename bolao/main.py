@@ -121,3 +121,10 @@ def ranking():
         """
     ).fetchall()
     return render_template("main/ranking.html", users=users)
+
+
+@bp.before_app_request
+def load_tournamenst():
+    g.tournaments = get_db().execute(
+        "SELECT id, name, code, type, emblem FROM tournaments"
+    ).fetchall()
