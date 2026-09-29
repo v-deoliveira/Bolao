@@ -53,14 +53,22 @@ def create_matches(matches):
         if season_id is None:
             raise KeyError(f"MATCH (id: {match.get('id')}) MISSING SEASON'S ID.")
 
-        score = match.get('score', {}).get('fullTime')
+        score = match.get('score', {})
+        if score.get('duration') == 'PENALTY_SHOOTOUT':
+            regular_time_score = score.get('regularTime')
+            extra_time_score = score.get('extraTime')
+            fulltime_score = dict([('away', regular_time_score['away'] + extra_time_score['away']), ('home', regular_time_score['home'] + extra_time_score['home'])])
+        else:
+            fulltime_score = score.get('fullTime', {})
+        
+        pso_score = score.get('penalties', {})
 
         db.execute(
             """
-                INSERT INTO matches (away_team, home_team, group_name, id, matchday, away_score, home_score, season_id, stage, status, utc_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO matches (away_team, home_team, group_name, id, matchday, away_score, home_score, season_id, stage, status, utc_date, pso_away_score, pso_home_score)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT (id) DO NOTHING
             """,
-            (away_id, home_id, match.get('group'), match.get('id'), match.get('matchday'), score.get('away'), score.get('home'), season_id, match.get('stage'), match.get('status'), match.get('utcDate')),
+            (away_id, home_id, match.get('group'), match.get('id'), match.get('matchday'), fulltime_score.get('away'), fulltime_score.get('home'), season_id, match.get('stage'), match.get('status'), match.get('utcDate'), pso_score.get('away'), pso_score.get('home')),
         )
 

@@ -56,7 +56,9 @@ CREATE TABLE matches (
     home_team INTEGER NOT NULL REFERENCES teams(id),
     away_team INTEGER NOT NULL REFERENCES teams(id),
     home_score INTEGER,
-    away_score INTEGER
+    away_score INTEGER,
+    pso_home_score INTEGER,
+    pso_away_score INTEGER
 );
 
 CREATE TABLE predictions (
