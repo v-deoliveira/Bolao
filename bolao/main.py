@@ -126,5 +126,16 @@ def ranking():
 @bp.before_app_request
 def load_tournamenst():
     g.tournaments = get_db().execute(
-        "SELECT id, name, code, type, emblem FROM tournaments"
+        """
+            SELECT tournaments.id,
+                tournaments.name,
+                tournaments.code,
+                tournaments.emblem,
+                areas.flag
+                FROM tournaments
+                JOIN areas
+                    ON areas.id = tournaments.area_id
+                WHERE tournaments.type = 'LEAGUE'
+                ORDER BY areas.id DESC, tournaments.name
+        """
     ).fetchall()
