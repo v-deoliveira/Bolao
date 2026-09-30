@@ -35,7 +35,7 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     {% for t in g.tournaments %}
-                                        <li><a class="dropdown-item" href="#">
+                                        <li><a class="dropdown-item" href="{{ url_for('main.tournament', id=t.id) }}">
                                             <img src="{{ t.flag }}" alt="{{ t.code }}" width="22" height="20">
                                             {{ t.name }}
                                         </a></li>
