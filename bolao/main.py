@@ -102,6 +102,48 @@ def matches():
                             tournament=tournament,
                             seasons=seasons)
 
+@bp.route('/tournament/<int:id>', methods=('GET', ))
+@login_required
+def tournament(id):
+    db = get_db()
+
+    tournament = db.execute(
+        "SELECT id, name, code, emblem FROM tournaments WHERE id = ?", (id,)
+    ).fetchone()
+    
+    seasons = db.execute(
+        "SELECT * FROM seasons WHERE tournament_id = ? ORDER BY start_date DESC",
+        (id,)
+    ).fetchall()
+
+    selected_season_id = request.args.get("season")
+    if selected_season_id is None:
+        selected_season_id = seasons[0]['id']
+
+    matches = db.execute(
+            """
+                SELECT home.short_name AS home_short_name, 
+                    away.short_name AS away_short_name, 
+                    matches.id, 
+                    matches.home_score, 
+                    matches.away_score, 
+                    matches.utc_date, 
+                    matches.status,
+                    matches.matchday
+                FROM matches
+                JOIN teams AS home
+                    ON home.id = matches.home_team
+                JOIN teams AS away
+                    ON away.id = matches.away_team
+                WHERE matches.season_id = ?
+                ORDER BY matches.utc_date, matches.matchday
+            """,
+            (selected_season_id,)
+        ).fetchall()
+
+    return render_template('main/matches.html', tournament=tournament,
+                            seasons=seasons,
+                            matches=matches)
 
 @bp.route('/ranking', methods=('GET', 'POST'))
 @login_required
@@ -122,7 +164,8 @@ def ranking():
     ).fetchall()
     return render_template("main/ranking.html", users=users)
 
-
+# This function will be executed before every request, and it will load the tournaments from the database and store them in the g object, which is a global object that can be accessed from any view function. 
+# This way, we can display them in the navigation bar.
 @bp.before_app_request
 def load_tournamenst():
     g.tournaments = get_db().execute(
