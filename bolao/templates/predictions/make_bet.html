@@ -6,14 +6,18 @@
 
 {% block content %}
     <div class="container py-5 text-center">
-        <h4>{{ match.home_team }} vs {{ match.away_team }}</h4>
+        <h4>
+            <img class="crest-bet img-fluid p-1 me-2" src="{{ match.home_crest }}" alt="{{ match.home_tla }}">
+            {{ match.home_team }} vs {{ match.away_team }}
+            <img class="crest-bet im-fluid p-1 me-2" src="{{ match.away_crest }}" alt="{{ match.away_tla }}">
+        </h4>
         <form method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="mb-3">
-                <input class="form-control mx-auto w-auto" type="number" placeholder="Home Score" name="home_score" min="0" required>
+                <input class="form-control mx-auto w-auto" autocomplete="off" type="number" placeholder="Home Score" name="home_score" min="0" required>
             </div>
             <div class="mb-3">
-                <input class="form-control mx-auto w-auto" type="number" placeholder="Away Score" name="away_score" min="0" required>
+                <input class="form-control mx-auto w-auto" autocomplete="off" type="number" placeholder="Away Score" name="away_score" min="0" required>
             </div>
             <button type="submit" class="btn btn-primary">Make Bet</button>
         </form>

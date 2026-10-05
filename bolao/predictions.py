@@ -31,20 +31,19 @@ def make_bet(match_id):
             )
             db.commit()
         except db.IntegrityError:
-            error = "You already have a bet for this match"
+            error = "INVALID MATCH OR BET ALREADY EXIST - CHECK YOUR BETS"
 
         flash(error) if error is not None else flash("Bet placed successfully")
-        return redirect(url_for("main.matches"))
+        return redirect(url_for("predictions.make_bet", match_id=match_id))
 
     match = db.execute(
         """
             SELECT home.name AS home_team, 
-                away.name AS away_team, 
-                matches.id, 
-                matches.home_score, 
-                matches.away_score, 
-                matches.utc_date, 
-                matches.status
+                away.name AS away_team,
+                home.tla AS home_tla,
+                away.tla AS away_tla,
+                home.crest AS home_crest,
+                away.crest AS away_crest
             FROM matches
             JOIN teams AS home
                 ON home.id = matches.home_team
