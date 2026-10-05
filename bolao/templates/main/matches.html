@@ -1,32 +1,20 @@
 {% extends 'layout.html' %}
 
 {% block header %}
-    <h2>{% block title %}Matches{% endblock %}</h2>
+    <h2>
+        <img class="emblem img-fluid p-1 me-2" src="{{ tournament.emblem }}" alt="{{ tournament.code }}">
+    </h2>
 {% endblock %}
 
 {% block content %}
-    <div class="container mb-3 text-center">
-        <form action="{{ url_for('main.matches') }}">
-            <select class="form-select mx-auto w-auto" name="tournament">
-                {% if tournament %}
-                    <option selected disabled>{{ tournament.name }}</option>
-                {% endif %}
-                {% for t in tournaments %}
-                    <option value="{{ t.id }}">{{ t.name }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Select</button>
-        </form>
-    </div>
-    <div>
-        <h4>{{ tournament.name }}</h4>
-        <form action="{{ url_for('main.matches') }}">
-            <select name="season">
+    <div class="mb-1 align-items-center">
+        <form action="{{ url_for('main.tournament', id=tournament.id) }}">
+            <select class="form-select-sm" name="season">
                 {% for s in seasons %}
-                    <option value="{{ s.id }}">{{ s.formated_season }}</option>
+                    <option value="{{ s.id }}">{{ season_label(s) }}</option>
                 {% endfor %}
             </select>
-            <button type="submit">Select</button>
+            <button type="submit" class="btn btn-light btn-sm">Select</button>
         </form>
     </div>
     {% if not matches %}
@@ -35,30 +23,24 @@
         <table class="table table-hover">
             <thead class="table-primary">
                 <tr>
-                    <th class="text-start">Home</th>
+                    <th class="text-start">Date</th>
+                    <th class="text-start">Matchup</th>
                     <th class="text-start">Score</th>
-                    <th class="text-start">Away</th>
-                    <th class="text-start">Time</th>
-                    <th class="text-start">Status</th>
-                    <th class="text-end"></th>
                 </tr>
             </thead>
             <tbody>
                 {% for match in matches %}
                     <tr>
-                        <td class="text-start">{{ match.home_team }}</td>
-                        <td>{{ match.home_score }} x {{ match.away_score }}</td>
-                        <td>{{ match.away_team }}</td>
-                        <td>{{ match.utc_date }}</td>
+                        <td class="text-start">{{ match.utc_date | format_datetime }}</td>
+                        <td>
+                            <img class="crest img-fluid p-1 me-2" src="{{ match.home_crest }}" alt="{{ match.home_short_name }}">
+                            {{ match.home_short_name }} - {{ match.away_short_name }}
+                            <img class="crest img-fluid p-1 ms-2" src="{{ match.away_crest }}" alt="{{ match.away_short_name }}">
+                        </td>
                         {% if match.status == 'SCHEDULED' or match.status == 'TIMED' %}
-                            <td>{{ match.status }}</td>
-                            <td>
-                                <form action="{{ url_for('predictions.make_bet', match_id=match['id'] )}}">
-                                    <button type="submit">BET</button>
-                                </form>
-                            </td>
+                            <td><a class="btn btn-success btn-sm" href="{{ url_for('predictions.make_bet', match_id=match['id']) }}">BET</a></td>
                         {% elif match.status == 'FINISHED' %}
-                            <td>FT</td>
+                            <td>{{ match.home_score }}:{{ match.away_score }}</td>
                         {% else %}
                             <td>{{ match.status }}</td>
                         {% endif %}
