@@ -123,7 +123,9 @@ def tournament(id):
     matches = db.execute(
             """
                 SELECT home.short_name AS home_short_name, 
-                    away.short_name AS away_short_name, 
+                    away.short_name AS away_short_name,
+                    home.crest AS home_crest,
+                    away.crest AS away_crest,
                     matches.id, 
                     matches.home_score, 
                     matches.away_score, 
