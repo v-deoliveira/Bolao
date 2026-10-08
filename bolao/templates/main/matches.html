@@ -35,7 +35,7 @@
                         <td>
                             <img class="crest img-fluid p-1 me-2" src="{{ match.home_crest }}" alt="{{ match.home_short_name }}">
                             {{ match.home_short_name }} - {{ match.away_short_name }}
-                            <img class="crest img-fluid p-1 ms-2" src="{{ match.away_crest }}" alt="{{ match.away_short_name }}">
+                            <img class="crest img-fluid p-1 me-2" src="{{ match.away_crest }}" alt="{{ match.away_short_name }}">
                         </td>
                         {% if match.status == 'SCHEDULED' or match.status == 'TIMED' %}
                             <td><a class="btn btn-success btn-sm" href="{{ url_for('predictions.make_bet', match_id=match['id']) }}">BET</a></td>
