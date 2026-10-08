@@ -1,39 +1,45 @@
 {% extends 'layout.html' %}
 
 {% block header %}
-    <h1>{% block title %}All games {% endblock %}</h1>
+    <h2>{% block title %}Your bets{% endblock %}</h2>
 {% endblock %}
 
 <!-- Still want to add tournament info into the table, or multiple tournaments  tables -->
 {% block content %}
-    <h4>Your Predictions</h4>
     {% if predictions %}
         <table class="table table-hover">
             <thead class="table-primary">
                 <tr>
-                    <th class="text-start">Home</th>
-                    <th class="text-start">Score</th>
-                    <th class="text-start">Away</th>
-                    <th class="text-start">Time</th>
-                    <th class="text-start">Final Score</th>
-                    <th class="text-start">Points</th>
+                    <th class="text-start">Tournament</th>
+                    <th>Date</th>
+                    <th>Matchup</th>
+                    <th>Final Score</th>
+                    <th>Your bet</th>
+                    <th>Points</th>
                 </tr>
             </thead>
             <tbody>
                 {% for prediction in predictions %}
                     <tr>
-                        <td class="text-start">{{ prediction.home_team }}</td>
-                        <td>{{ prediction.home_score }} x {{ prediction.away_score }}</td>
-                        <td>{{ prediction.away_team }}</td>
-                        <td>{{ prediction.utc_date }}</td>
-                        <td>
-                        {% if prediction.status == 'FINISHED' %}
-                            {{prediction.ft_home_score}} x {{prediction.ft_away_score}}
-                        {% else %}
-                            {{ prediction.status }}
-                        {% endif %}
+                        <td class="text-start">
+                            <img class="crest img-fluid p-1 me-2" src="{{ prediction.tournament_emblem }}" alt="{{ prediction.tournament_code }}">
+                            {{ prediction.tournament_name }}
                         </td>
-                        <td>{{ prediction.points }}</td>
+                        <td>{{ prediction.utc_date | format_datetime }}</td>
+                        <td>
+                            <img class="crest img-fluid p-1 me-2" src="{{ prediction.home_crest }}" alt="{{ prediction.home_short_name }}">
+                            {{ prediction.home_tla }} - {{ prediction.away_tla }}
+                            <img class="crest img-fluid p-1 me-2" src="{{ prediction.away_crest }}" alt="{{ prediction.away_short_name }}">
+                        </td>
+                        {% if prediction.status == 'FINISHED' %}
+                            <td>{{ prediction.ft_home_score }}:{{ prediction.ft_away_score }}</td>
+                            <td>{{ prediction.home_score }}:{{ prediction.away_score }}</td>
+                            <td>{{ prediction.points }}</td>
+                        {% else %}
+                            <td>{{ prediction.status }}</td>
+                            <td>{{ prediction.home_score }}:{{ prediction.away_score }}</td>
+                            <td> - </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>

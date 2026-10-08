@@ -13,9 +13,15 @@ def index():
 
     predictions = db.execute(
         """
-            SELECT home.name AS home_team,
-                away.name AS away_team,
-                matches.id AS match_id,
+            SELECT tournaments.name AS tournament_name,
+                tournaments.emblem AS tournament_emblem,
+                tournaments.code AS tournament_code,
+                home.short_name AS home_short_name,
+                home.tla AS home_tla,
+                home.crest AS home_crest,
+                away.short_name AS away_short_name,
+                away.tla AS away_tla,
+                away.crest AS away_crest,
                 predictions.home_score AS home_score,
                 predictions.away_score AS away_score,
                 matches.utc_date,
@@ -24,6 +30,10 @@ def index():
                 matches.home_score AS ft_home_score,
                 matches.away_score AS ft_away_score
             FROM predictions
+            JOIN seasons
+                ON seasons.id = matches.season_id
+            JOIN tournaments
+                ON tournaments.id = seasons.tournament_id
             JOIN teams AS home
                 ON home.id = matches.home_team
             JOIN teams AS away
