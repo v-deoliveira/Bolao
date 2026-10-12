@@ -67,8 +67,17 @@ def create_matches(matches):
             """
                 INSERT INTO matches (away_team, home_team, group_name, id, matchday, away_score, home_score, season_id, stage, status, utc_date, pso_away_score, pso_home_score)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT (id) DO NOTHING
+                ON CONFLICT (id)
+                DO
+                    UPDATE
+                    SET away_score = excluded.away_score,
+                        home_score = excluded.home_score,
+                        status = excluded.status,
+                        utc_date = excluded.utc_date,
+                        pso_away_score = excluded.pso_away_score,
+                        pso_home_score = excluded.pso_home_score
+                    WHERE excluded.status = 'FINISHED'
             """,
-            (away_id, home_id, match.get('group'), match.get('id'), match.get('matchday'), fulltime_score.get('away'), fulltime_score.get('home'), season_id, match.get('stage'), match.get('status'), match.get('utcDate'), pso_score.get('away'), pso_score.get('home')),
+            (away_id, home_id, match.get('group'), match.get('id'), match.get('matchday'), fulltime_score.get('away'), fulltime_score.get('home'), season_id, match.get('stage'), match.get('status'), match.get('utcDate'), pso_score.get('away'), pso_score.get('home')), 
         )
 
