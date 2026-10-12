@@ -6,6 +6,7 @@ from .admin import admin_required
 from .football_api import(
     get_competitions, get_matches, get_areas, get_teams, create_matches
 )
+from .helpers import insert_points
 import requests
 
 bp = Blueprint('admin_api', __name__, url_prefix='/admin_api')
@@ -95,11 +96,20 @@ def sync_matches(id):
         flash(f"The API's response is missing data: {e}")
         return redirect(url_for('admin_tournaments.index'))
 
+    # A separete try/except block for the insert_points, since is not related to the API sync.
+    try:
+        insert_points()
+        db.commit()
+        flash("Points updated.")
+    except db.IntegrityError as e:
+        flash(f"Error inserting points: {e}")
+        return redirect(url_for('admin_tournaments.index'))
+
     return redirect(url_for('admin_tournaments.index'))
 
 @bp.route('/test', methods=('GET', 'POST'))
 @admin_required
 def test():
-    id = '2000'
-    data = get_matches(id)
+    id = '2016'
+    data = get_competitions()
     return data
