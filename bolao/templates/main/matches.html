@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
 
+{% block title %}{{ tournament.name }}{% endblock %}
 {% block header %}
     <h2>
         <img class="emblem img-fluid p-1 me-2" src="{{ tournament.emblem }}" alt="{{ tournament.code }}">
