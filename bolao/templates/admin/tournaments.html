@@ -24,6 +24,12 @@
                             <button type="submit">Delete</button>
                         </form>
                     </td>
+                    <td>
+                        <form action="{{ url_for('admin_api.sync_matches', id=t['id']) }}" method="post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit">Sync</button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
