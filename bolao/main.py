@@ -3,6 +3,8 @@ from flask import(
 )
 from .auth import login_required
 from .db import get_db
+from zoneinfo import ZoneInfo
+from datetime import datetime
 
 bp = Blueprint('main', __name__)
 
@@ -41,6 +43,7 @@ def index():
             JOIN matches
                 ON matches.id = predictions.match_id
             WHERE predictions.user_id = ?
+            ORDER BY matches.utc_date
         """,
         (g.user["id"],)   
     ).fetchall()
@@ -129,3 +132,9 @@ def load_tournamenst():
                 ORDER BY areas.id DESC, tournaments.name
         """
     ).fetchall()
+
+
+@bp.route('/set-timezone', methods=('POST',))
+@login_required
+def set_timezone():
+    return "", 204
