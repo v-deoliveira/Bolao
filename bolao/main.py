@@ -136,5 +136,20 @@ def load_tournamenst():
 
 @bp.route('/set-timezone', methods=('POST',))
 @login_required
+# On this project, only logged in users can see the matches, so only they can set a timezone.
 def set_timezone():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return "", 400
+    # On both examples, isinstance checks if the data is of the class I need it to be. The first one a dict, the second a string. If not, it will return a 400 error, which is a bad request error.
+    tz_name = data.get('timezone')
+    if not isinstance(tz_name, str):
+        return "", 400
+
+    try:
+        ZoneInfo(tz_name)
+    except Exception:
+        return "", 400
+
+    session['timezone'] = tz_name
     return "", 204
