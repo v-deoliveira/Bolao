@@ -1,6 +1,8 @@
 from .db import get_db
-from datetime import datetime
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from flask import g
+
 
 def outcome(home_score, away_score):
     if home_score > away_score:
@@ -52,10 +54,16 @@ def format_season_label(season):
         return f"{season['start_date'][:4]}"
 
 
-# Format the api's date format to a better user readable format. It will be called from the template itself,
-# with the option to add a custom format, if needed.
-def format_datetime(value, fmt="%d %b %Y, %H:%M"):
-    dt = datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+# This function will format the stored naive UTC date, into an aware object. Then will convert it to the users timezone.
+# Will return the data in a better format for user reading, wiht the option to adjust this format as needed.
+def format_datetime_tz(value, tz_name=None, fmt="%d %b %Y, %H:%M"):
+    dt = datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    if tz_name:
+        try:
+            dt = dt.astimezone(ZoneInfo(tz_name))
+        except Exception:
+            pass
+
     return dt.strftime(fmt)
 
 # Using the approach of prebuilt queries, so the value of table_name will be filtered by _DELETE_QUERIES
