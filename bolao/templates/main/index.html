@@ -25,7 +25,7 @@
                             <img class="crest img-fluid p-1 me-2" src="{{ prediction.tournament_emblem }}" alt="{{ prediction.tournament_code }}">
                             {{ prediction.tournament_name }}
                         </td>
-                        <td>{{ prediction.utc_date | format_datetime }}</td>
+                        <td>{{ format_datetime_tz(prediction.utc_date, session.timezone) }}</td>
                         <td>
                             <img class="crest img-fluid p-1 me-2" src="{{ prediction.home_crest }}" alt="{{ prediction.home_short_name }}">
                             {{ prediction.home_tla }} - {{ prediction.away_tla }}

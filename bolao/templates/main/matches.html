@@ -32,7 +32,7 @@
             <tbody>
                 {% for match in matches %}
                     <tr>
-                        <td class="text-start">{{ match.utc_date | format_datetime }}</td>
+                        <td class="text-start">{{ format_datetime_tz(match.utc_date, session.timezone) }}</td>
                         <td>
                             <img class="crest img-fluid p-1 me-2" src="{{ match.home_crest }}" alt="{{ match.home_short_name }}">
                             {{ match.home_short_name }} - {{ match.away_short_name }}
