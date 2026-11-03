@@ -3,6 +3,8 @@ import os
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 from .helpers import format_season_label, format_datetime_tz
+from . import scheduler
+import logging
 
 def create_app(test_config=None):
     # create and config app
@@ -27,6 +29,9 @@ def create_app(test_config=None):
 
     # ensure the instance folder exists
     os.makedirs(app.instance_path, exist_ok=True)
+
+    # Add this to set logging level to INFO, so logger.info() messages won't be silently ignored.
+    app.logger.setLevel(logging.INFO)
 
     from . import db
     db.init_app(app)
@@ -56,6 +61,11 @@ def create_app(test_config=None):
     app.register_blueprint(main.bp)
     app.add_url_rule('/', endpoint='index')
 
+    # The scheduler will only be started if these conditions are met, not in testing, 
+    # and if not in debug mode or if the WERKZEUG_RUN_MAIN is true, which means that the app is running in the main process.
+    if not app.testing and (not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true'):
+        scheduler.init_scheduler(app)
+    
     @app.route('/hello')
     def hello():
         return 'hello, world!'
