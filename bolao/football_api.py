@@ -1,6 +1,7 @@
 import requests
 from flask import current_app
 from .db import get_db
+from .helpers import sync_bets
 
 BASE_URL = 'https://api.football-data.org/v4'
 
@@ -81,3 +82,40 @@ def create_matches(matches):
             (away_id, home_id, match.get('group'), match.get('id'), match.get('matchday'), fulltime_score.get('away'), fulltime_score.get('home'), season_id, match.get('stage'), match.get('status'), match.get('utcDate'), pso_score.get('away'), pso_score.get('home')), 
         )
 
+def sync_results():
+    db = get_db()
+    data = _get("/matches", params={"status": "FINISHED"})
+    matches = data.get("matches", [])
+    print(matches)
+
+    updated = 0
+    skipped = 0
+
+    for match in matches:
+            match_id = match.get('id')
+            if match_id is None:
+                raise KeyError("API RESPONSE MISSING MATCH ID")
+            
+            score = match.get('score', {}).get('fullTime', {})
+            home_score = score.get('home')
+            away_score = score.get('away')
+            
+            cur = db.execute(
+                """
+                    UPDATE matches
+                    SET home_score = ?,
+                        away_score = ?,
+                        status = ?,
+                        utc_date = ?
+                    WHERE id = ?
+                """,
+                (home_score, away_score, match.get('status'), match.get('utcDate'), match_id), 
+            )
+
+            if cur.rowcount == 0:
+                skipped += 1
+            else:
+                updated += 1
+                sync_bets(match_id, home_score, away_score)
+
+    return updated, skipped
