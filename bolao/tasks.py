@@ -6,9 +6,9 @@ def update_results(app):
     with app.app_context():
         db = get_db()
         try:
-            sync_results()
+            updated, skipped = sync_results()
             db.commit()
-            app.logger.info("Results synced.")
+            app.logger.info(f"Results synced. Updated: {updated}, Skipped: {skipped}")
         except Exception:
             db.rollback()
             app.logger.exception("Error syncing results.")
