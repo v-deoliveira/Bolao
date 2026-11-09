@@ -46,6 +46,24 @@ def insert_points():
             (pts, b['bet_id'])
         )
 
+# A separate function to update points for a specific match, so it can be called from the sync_results function, after updating the match scores.
+def sync_bets(match_id, home_score, away_score):
+    db = get_db()
+    bets = db.execute(
+        """
+            SELECT id, home_score, away_score
+            FROM predictions
+            WHERE match_id = ?
+        """,
+        (match_id,)
+    )
+    for bet in bets:
+        pts = calculate_points(home_score, away_score, bet['home_score'], bet['away_score'])
+        db.execute(
+            "UPDATE predictions SET points = ? WHERE id = ?",
+            (pts, bet['id'])
+        )
+
 
 def format_season_label(season):
     if season['start_date'][:4] != season['end_date'][:4]:
